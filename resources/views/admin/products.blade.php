@@ -12,10 +12,10 @@
 
         <div class="row" style="margin-top: 10px">
             @foreach ($categories as $category)
-                
-            
+
+
             <div class="col-4">
-                
+
                 <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
                     <button class="btn btn-blue view_product" style="align-items: center" value="{{$category->CategoryID}}" id="view_product">
                     <div class="card-body" style="text-align: center">
@@ -23,7 +23,7 @@
                     </div>
                 </button>
                 </div>
-                
+
             </div>
             @endforeach
         </div>
@@ -35,7 +35,7 @@
             <div class="form-group" style="width: 20rem;">
                 <div class="input-group mb-3">
                   <span class="input-group-text"><i class="fas fa-search"></i></span>
-                  <input type="text" id="search" name="search" class="form-control" placeholder="Search"> 
+                  <input type="text" id="search" name="search" class="form-control" placeholder="Search">
                 </div>
             </div>
 
@@ -64,9 +64,9 @@
     <script src="../../js/products.js"></script>
     <script>
         $(document).ready(function(){
-        
+
         //fetch_customer_data();
-        
+
          function fetch_customer_data(query = '')
          {
           $.ajax({
@@ -81,7 +81,7 @@
            }
           })
          }
-        
+
          $(document).on('keyup', '#search', function(){
           var query = $(this).val();
           fetch_customer_data(query);

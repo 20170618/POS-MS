@@ -40,7 +40,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr style="text-align: center;">
-                            <th scope="col">Debtor ID</th>
+                            <th scope="col">Debtor IDs</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact Number</th>
                             <th scope="col">Action</th>
