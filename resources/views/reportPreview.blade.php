@@ -110,7 +110,7 @@
 
     <body>
     <div style="container-sm">
-            <h1>REPORT PREVIEW</h1>
+            <h1>REPORT PREVIEWS</h1>
             <a class="button" href="{{ URL::to('/test') }}" style='float:right'>
                 Export to PDF
             </a>
