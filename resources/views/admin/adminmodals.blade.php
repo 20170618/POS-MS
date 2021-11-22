@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <button type="button" class="btn btn-yellow" data-bs-dismiss="modal">Records</button>
-                
+
                 <div class="row">
                     <div class="container" style="margin-top: 10px">
                         <table class="table table-hover">
@@ -24,7 +24,7 @@
                             </tr>
                             </thead>
                             <tbody>
-        
+
                             <tr class="table-light">
                                 <th scope="row">Dela Cruz, Juan</th>
                                 <td>Salesperson</td>
@@ -32,7 +32,7 @@
                                 <td>12:00am</td>
                                 <td>01/01/2021</td>
                             </tr>
-                            
+
                             </tbody>
                         </table>
                     </div>
@@ -59,7 +59,7 @@
 
                         <div class="row">
                             <div class="container">
-                                
+
                             <table class="table table-hover">
                                 <thead>
                                 <tr class="table yellow">
@@ -68,12 +68,12 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-            
+
                                 <tr class="table yellow">
                                     <th scope="row"></th>
                                     <td></td>
                                 </tr>
-                                
+
                                 </tbody>
                             </table>
 
@@ -118,7 +118,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                
+
                 <div class="row">
                     <div class="container" style="margin-top: 10px">
                         <table class="table table-hover">
@@ -127,26 +127,26 @@
                                 <th scope="col">Name</th>
                                 <th scope="col">Position</th>
                                 <th scope="col">Actions</th>
-                               
-                                
+
+
                             </tr>
                             </thead>
                             <tbody>
-        
+
                             <tr class="table-light">
                                 <th scope="row">Dela Cruz, Juan</th>
                                 <td>Salesperson</td>
                                 <td>
                                     <button class="btn btn-primary" type="button"><i class="fas fa-check"></i></button>
-                                    
+
                                     &nbsp;
-        
+
                                     <button class="btn btn-danger" type="button"><i class="fas fa-times"></i></button>
-                                    
+
                                 </td>
                             </tr>
-                           
-                            
+
+
                             </tbody>
                         </table>
                     </div>
@@ -156,3 +156,4 @@
     </div>
 </div>
 <!-- End Pending Modal -->
+

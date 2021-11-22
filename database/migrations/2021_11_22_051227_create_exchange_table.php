@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSalesTable extends Migration
+class CreateExchangeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateSalesTable extends Migration
      */
     public function up()
     {
-        Schema::create('Sales', function (Blueprint $table) {
-            $table->id('SalesID');
-            $table->unsignedBigInteger('PersonInCharge');
-            $table->string('ModeOfPayment', 6);
+        Schema::create('exchange', function (Blueprint $table) {
+            $table->unsignedBigInteger('SalesID');
+            $table->unsignedBigInteger('ExchangedProductID');
+            $table->unsignedBigInteger('NewProductID');
             $table->timestamps();
-
-            $table->foreign('PersonInCharge')->references('UserID')->on('users');
         });
     }
 
@@ -30,6 +28,6 @@ class CreateSalesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('Sales');
+        Schema::dropIfExists('exchange');
     }
 }

@@ -4,11 +4,11 @@
     @if ($message = Session::get('deleteTransaction'))
         <?php
         echo "<script>
-                                                                    Swal.fire(
-                                                                        'Deleted.',
-                                                                        'The sales record has been deleted.',
-                                                                        'danger'
-                                                                    )   </script> ";
+            Swal.fire(
+                'Deleted.',
+                'The sales record has been deleted.',
+                'danger'
+            )   </script> ";
         ?>
     @endif
 @endsection
@@ -51,11 +51,11 @@
                         @foreach ($debtors as $debtor)
                             <tr style="align-content: center; text-align: center;">
 
-                                <th scope="row">{{ $debtor->DebtorID }}</th>
-                                <td>{{ $debtor->DebtorName }}</td>
-                                <td>{{ $debtor->ContactNumber }}</td>
+                                <th scope="row">{{ $debtor->SalesID }}</th>
+                                <td>{{ $debtor->Debtor }}</td>
+                                <td>{{ $debtor->Balance }}</td>
                                 <td>
-                                    <button class="btn btn-primary debt_record" value="{{ $debtor->DebtorID }}"><i
+                                    <button class="btn btn-primary debt_record"><i
                                             class="fas fa-eye"></i></button>
                                     <a class="btn btn-primary" href=""><i class="fas fa-pen"></i></a>
                                     <button class="btn btn-secondary delete_transaction" value="" type="button"

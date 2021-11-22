@@ -9,7 +9,7 @@
 
     <div class="container" style="margin-top: 10px">
         <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
-
+ <center>
         <div class="row" style="margin-top: 10px">
             @foreach ($categories as $category)
 
@@ -29,6 +29,9 @@
         </div>
 
         <hr>
+
+
+</center>
 
         <a><h5>Search Product</h5></a>
         <div class="form-group">

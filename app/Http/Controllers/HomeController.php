@@ -1,10 +1,10 @@
 <?php
-   
+
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Debtor;
+use App\Models\Credit;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesDetails;
@@ -15,7 +15,7 @@ use Redirect,Response;
 use Illuminate\Support\Facades\Log;
 use PDF;
 use Carbon\Carbon;
-   
+
 class HomeController extends Controller
 {
     /**
@@ -27,7 +27,7 @@ class HomeController extends Controller
     {
         $this->middleware(['auth','verified']);
     }
-  
+
     /**
      * Show the application dashboard.
      *
@@ -58,25 +58,25 @@ class HomeController extends Controller
         return view('admin.category',compact('categories'));
     }
 
-    public function salespersonProducts()
-    {
-        $foodProducts = DB::table('product')
-            ->select('ProductName', 'Price')
-            ->where('Category', '=' , 'food')
-            ->latest()
-            ->get();
-        $nonFoodProducts = DB::table('product')
-            ->select('ProductName', 'Price')
-            ->where('Category', '=' , 'nonFood')
-            ->latest()
-            ->get();
-        $eLoads = DB::table('product')
-            ->select('ProductName', 'Price')
-            ->where('Category', '=' , 'eLoad')
-            ->latest()
-            ->get();
-        return view('salesperson.salespersonproducts', compact('foodProducts', 'nonFoodProducts', 'eLoads'));
-    }
+    // public function salespersonProducts()
+    // {
+    //     $foodProducts = DB::table('product')
+    //         ->select('ProductName', 'Price')
+    //         ->where('Category', '=' , 'food')
+    //         ->latest()
+    //         ->get();
+    //     $nonFoodProducts = DB::table('product')
+    //         ->select('ProductName', 'Price')
+    //         ->where('Category', '=' , 'nonFood')
+    //         ->latest()
+    //         ->get();
+    //     $eLoads = DB::table('product')
+    //         ->select('ProductName', 'Price')
+    //         ->where('Category', '=' , 'eLoad')
+    //         ->latest()
+    //         ->get();
+    //     return view('salesperson.salespersonproducts', compact('foodProducts', 'nonFoodProducts', 'eLoads'));
+    // }
 
     public function salespersonAddTransactions()
     {
@@ -85,7 +85,7 @@ class HomeController extends Controller
         //     ->get();
         return view('salesperson.salespersonaddtransaction');
     }
-  
+
     /**
      * Show the application dashboard.
      *
@@ -114,22 +114,57 @@ class HomeController extends Controller
         return view('admin.products', compact('categories','products'));
     }
 
+    public function salesPersonProducts()
+    {
+        $categories = DB::table('categories')
+            ->select()
+            ->get();
+        $products = DB::table('product')
+            ->join('categories', 'product.Category','=','categories.CategoryID')
+            ->select()
+            ->get();
+
+        return view('salesperson.salespersonproducts', compact('categories','products'));
+    }
+
     public function adminTransactions()
+    {
+        $sales = DB::table('sales')
+            ->join('users','sales.PersonInCharge','=','users.UserID')
+            ->select('sales.*', 'users.*', 'sales.created_at as created_at')
+            ->where('ModeOfPayment','!=','Credit')
+            ->orderBy('sales.SalesID', 'desc')
+            ->get();
+        return view('admin.transactions', compact('sales'));
+    }
+
+    public function adminEload()
     {
         $sales = DB::table('sales')
             ->join('users','sales.PersonInCharge','=','users.UserID')
             ->select('sales.*', 'users.*', 'sales.created_at as created_at')
             ->orderBy('sales.SalesID', 'desc')
             ->get();
-        return view('admin.transactions', compact('sales'));
+        return view('admin.eload', compact('sales'));
+    }
+
+    public function salesPersonEload()
+    {
+        $sales = DB::table('sales')
+            ->join('users','sales.PersonInCharge','=','users.UserID')
+            ->select('sales.*', 'users.*', 'sales.created_at as created_at')
+            ->orderBy('sales.SalesID', 'desc')
+            ->get();
+        return view('salesperson.eload', compact('sales'));
     }
 
     public function adminAddTransactions()
     {
-        // $products = DB::table('product')
-        //     ->select('ProductName', 'Price')
-        //     ->get();
-        return view('admin.addtransaction');
+        $debtors = DB::table('credits')
+             ->select()
+             ->orderBy('BalancePayDate')
+             ->get();
+        return view('admin.addtransaction', compact('debtors'));
     }
 
     public function deleteTransaction($id){
@@ -138,7 +173,7 @@ class HomeController extends Controller
              ->select('sales.*', 'users.*')
              ->where('sales.SalesID','=', $id)
              ->get('salesID');
-        
+
         if($sales){
             return response()->json([
             'status'=>200,
@@ -200,9 +235,9 @@ class HomeController extends Controller
                                 'message'=>'Updated Successfully',
                             ]);
                 }
-                
+
                 }
-                
+
             }
             else
             {
@@ -211,7 +246,7 @@ class HomeController extends Controller
                     'message'=>'Pizza Not Found',
                 ]);
             }
-            
+
         }
     }
 
@@ -234,8 +269,6 @@ class HomeController extends Controller
         $validator = Validator::make($request->all(), [
             'PersonInCharge' =>'required',
             'ModeOfPayment' =>'required',
-            'AmountDue' =>'required',
-            'AmountPaid' =>'required',
         ]);
 
         if($validator->fails()){
@@ -247,13 +280,11 @@ class HomeController extends Controller
             $sales= new Sales;
             $sales->PersonInCharge = $request->input('PersonInCharge');
             $sales->ModeOfPayment = $request->input('ModeOfPayment');
-            $sales->AmountDue = $request->input('AmountDue');
-            $sales->AmountPaid = $request->input('AmountPaid');
             $sales->save();
             $id = $sales->SalesID;
 
             $data = $request->input('products');
-            
+
             foreach ($data as $data_ID) {
                 $salesDetails = new SalesDetails;
                 $salesDetails->SalesID = $id;
@@ -274,10 +305,8 @@ class HomeController extends Controller
         $validator = Validator::make($request->all(), [
             'PersonInCharge' =>'required',
             'ModeOfPayment' =>'required',
-            'AmountDue' =>'required',
             'AmountPaid' =>'required',
-            'DebtorName' => 'unique:debtor,DebtorName',
-            'ContactNumber' => ['required','regex:/(09)[0-9]{9}/','min:11'],
+            'DebtorName' => 'required',
         ]);
 
         if($validator->fails()){
@@ -286,23 +315,21 @@ class HomeController extends Controller
                 'errors'=>$validator->errors()->all(),
             ]);
         }else{
-            $debtor=new Debtor;
-            $debtor->DebtorName = $request->input('DebtorName');
-            $debtor->ContactNumber = $request->input('ContactNumber');
-            $debtor->save();
-            $dID = $debtor->DebtorID;
-
             $sales= new Sales;
             $sales->PersonInCharge = $request->input('PersonInCharge');
             $sales->ModeOfPayment = 'Credit';
-            $sales->AmountDue = $request->input('AmountDue');
-            $sales->AmountPaid = $request->input('AmountPaid');
-            $sales->Debtor = $dID;
             $sales->save();
             $id = $sales->SalesID;
 
+            $debtor=new Credit;
+            $debtor->SalesID =$id;
+            $debtor->Debtor = $request->input('DebtorName');
+            $debtor->Balance = $request->input('Balance');
+            $debtor->InitialPayment= $request->input('AmountPaid');
+            $debtor->save(); // store new debtor into db
+
             $data = $request->input('products');
-            
+
             foreach ($data as $data_ID) {
                 $salesDetails = new SalesDetails;
                 $salesDetails->SalesID = $id;
@@ -329,7 +356,7 @@ class HomeController extends Controller
                     ->select()
                     ->where('SalesID','=',$id)
                     ->get();
-        
+
         return view('admin.transactionDetails', compact('details','sales'));
 
     }
@@ -383,34 +410,34 @@ class HomeController extends Controller
     public function adminGenerateReport(Request $request){
         $now = Carbon::now();
         $check = $request->input('checkedRadio');
-        
+
         if($check =='MonthlyRadio'){
             $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
             $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
-            
+
             $transactions=DB::table('sales')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->get();
         }else if($check=='AnnualRadio'){
             $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
             $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
-            
+
             $transactions=DB::table('sales')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->get();
         }else if($check=='DailyRadio'){
             $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
             $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
-            
+
             $transactions=DB::table('sales')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->get();
         }
-        
+
 
         $data="sample";
          $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
-        
+
 
         return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
     }
@@ -495,7 +522,7 @@ class HomeController extends Controller
         else
         {
             $categories = Category::find($id);
-            
+
 
             if($categories)
             {
@@ -514,13 +541,13 @@ class HomeController extends Controller
                     'message'=>'Pizza Not Found',
                 ]);
             }
-            
+
         }
     }
     public function categoryDestroy($id)
     {
         //
-        
+
 
         try
         {
@@ -538,7 +565,7 @@ class HomeController extends Controller
             ]);
         }
 
-        
+
     }
 
     public function action(Request $request){
@@ -547,6 +574,8 @@ class HomeController extends Controller
             $query = $request->get('query');
             if($query != ''){
                 $data = DB::table('product')
+                    ->join('categories','product.Category','=','categories.CategoryID')
+                    ->where('CategoryName','NOT LIKE','%E Load%')
                     ->where('ProductName', 'LIKE', '%'.$query.'%')
                     ->orderBy('ProductName', 'desc')
                     ->take(7)
@@ -557,7 +586,7 @@ class HomeController extends Controller
 
             $total_row = $data->count();
             if($total_row > 0){
-                
+
                     foreach($data as $row){
                     $output .= '
                     <tr style = "color:white;">
@@ -567,7 +596,7 @@ class HomeController extends Controller
                     </tr>
                     ';
                     }
-                
+
             }else{
                 $output = '
                 <tr style = "color:white; text-align:center;">
@@ -591,36 +620,33 @@ class HomeController extends Controller
                 $data = DB::table('sales')
                     ->join('users','sales.PersonInCharge','=','users.UserID')
                     ->select('users.FirstName as FirstName','sales.*', 'users.*', 'sales.created_at as created_at')
-                    ->where('SalesID', 'LIKE', '%'.$query.'%')
-                    ->orWhere('sales.created_at','LIKE', '%'.$query.'%')
-                    ->orWhere('users.FirstName','LIKE', '%'.$query.'%')
-                    ->orWhere('users.LastName','LIKE', '%'.$query.'%')
+                    ->whereRaw("((ModeOfPayment = 'Cash') AND (SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
                     ->orderBy('sales.SalesID', 'desc')
                     ->get();
             }else{
-                $data = DB::table('sales')->get();
+                $data = DB::table('sales')->join('users','sales.PersonInCharge','=','users.UserID')->where('ModeOfPayment','=','Cash')->get();
             }
 
             $total_row = $data->count();
             if($total_row > 0){
-                
+
                     foreach($data as $row){
                     $output .= '
                     <tr style = "align-content: center; text-align: center;">
                         <th scope="row">'.$row->SalesID.'</th>
-                        <td>&#8369; '.(number_format($row->AmountToPay, 2)).'</td>
+                        <td>'.$row->ModeOfPayment.'</td>
                         <td>'.$row->created_at.'</td>
                         <td>'.$row->FirstName.' '.$row->LastName.'</td>
                         <td>
                                 <a href="'.route('admin.transactionDetails', $row->SalesID).'" class="btn btn-primary "><i class="fas fa-eye"></i></a>
                                 <a class="btn btn-primary" href="'.route('admin.editTransaction', $row->SalesID).'"><i class="fas fa-pen"></i></a>
                                 &nbsp;
-                                <button class="btn btn-danger delete_transaction" value="'.$row->SalesID.'" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-secondary delete_transaction" value="'.$row->SalesID.'" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-archive"></i></button>
                         </td>
                     </tr>
                     ';
                     }
-                
+
             }else{
                 $output = '
                 <tr style = "text-align:center;">
@@ -638,7 +664,7 @@ class HomeController extends Controller
 
     public function adminDebtors()
     {
-        $debtors = DB::table('debtor')
+        $debtors = DB::table('credits')
             ->select()
             ->get();
         return view('admin.debtors', compact('debtors'));
@@ -660,7 +686,7 @@ class HomeController extends Controller
                 'debtor'=>$debtor,
             ]);
         }
-        
+
     }
 
     public function adminUserManagement()
@@ -690,18 +716,18 @@ class HomeController extends Controller
             ->get();
         return view('admin.reports', compact('salespersons','categories'));
     }
-    
-    
+
+
 
     public function createPDF(){
         // retrieve all records from db
         $now = Carbon::now();
         // $check = $request->input('checkedRadio');
-        
+
         // if($check =='MonthlyRadio'){
         //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
         //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
-            
+
         //     $transactions=DB::table('sales')
         //         ->whereBetween('created_at', [$startDate, $endDate])
         //         ->get();
@@ -711,7 +737,7 @@ class HomeController extends Controller
         // }else if($check=='AnnualRadio'){
         //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
         //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
-            
+
         //     $transactions=DB::table('sales')
         //         ->whereBetween('created_at', [$startDate, $endDate])
         //         ->get();
@@ -720,7 +746,7 @@ class HomeController extends Controller
         // }else if($check=='DailyRadio'){
         //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
         //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
-            
+
         //     $transactions=DB::table('sales')
         //         ->whereBetween('created_at', [$startDate, $endDate])
         //         ->get();
@@ -728,13 +754,12 @@ class HomeController extends Controller
         //     echo $transactions;
         // }
         // share data to view
-            
+
         $data="sample";
          $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
-        
+
 
         return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
-    } 
+    }
 }
 
-  

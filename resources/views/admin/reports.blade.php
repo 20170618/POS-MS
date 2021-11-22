@@ -176,7 +176,7 @@
 
             </div>
             <div class="card-footer" style="text-align: right">
-                <button class="btn btn-yellow" type="button" style="width: 10rem;" id="GenerateButton">Generate</button>
+            <a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>
             </div>
         </div>
 
@@ -249,7 +249,7 @@
                         data: data,
                         dataType: "json",
                         success: function(response) {
-                            window.location.href = '/test'; 
+                            window.location.href = '/test';
                         }
                     });
                 }

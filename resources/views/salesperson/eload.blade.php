@@ -1,227 +1,134 @@
-@extends('masterlayout.adminlayout')
+@extends('masterlayout.salespersonlayout')
 
 @section('location')
-    TRANSACTIONS
+    E-LOAD
 @endsection
-
 
 @section('content')
     <div id="sales_message"></div>
-    <!-- Add Debtor Modal -->
-    <div id="addDebtorModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+
+    <br>
+
+    <div class="container" style="margin-top: 10px">
+        <div class="row">
+            <div class="col-3">
+                <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addRegularModal">E-Load Regular Order</button>
+            </div>
+            <div class="col-3">
+                <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addPromoModal">E-Load Promo Order</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add Regular Modal -->
+    <div id="addRegularModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header blue-bg yellow">
-                    <h5 class="modal-title"><i class="fas fa-money-check-alt"></i>  &nbsp;&nbsp;Add Debt Record</h5>
+                    <h5 class="modal-title">Add Regular Load Order</h5>
                     <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true"></span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="debt_errList"></div>
-                    <p>This transaction has been identified as a debt record.</p>
+                    <div id="saveform_errList"></div>
                     <div class="form-group">
-                        <label class="form-label mt-4">Debtor Name</label>
+                        <label for="exampleSelect2" class="form-label mt-4">Operator</label>
+                        <select multiple="" class="form-select" id="exampleSelect2">
+                          <option>SMART</option>
+                          <option>GLOBE</option>
+                          <option>SUN</option>
+                          <option>TNT</option>
+                          <option>TM</option>
+                        </select>
+                      </div>
 
-                            <input type="text" class="form-control" placeholder="Enter Debtor Name" name="debtName" id="debtName" required>
-                    </div>
+                      <div class="row">
+                          <div class="col">
+                            <div class="form-group">
+                                <label class="form-label mt-4">Price</label>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="0.00" name="regularPrice" id="regularPrice" min="1.00">
+                                </div>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <div class="form-group">
+                                <label class="form-label mt-4">Markup</label>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="0.00" name="markUp" id="markUp" min="1.00" readonly>
+                                </div>
+                            </div>
+                          </div>
 
+                      </div>
 
-                    <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example" tabindex="0">
-                    <p>New debtor must not have any running debts.</p>
-                        <table class="table table-hover mt-4">
-                            <thead>
-                              <tr>
-                                <th scope="col">Debtors</th>
-                                <th scope="col">Balance</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($debtors as $debtor)
-
-
-                              <tr>
-                                <th scope="row">{{$debtor->Debtor}}</th>
-                                <td>{{$debtor->Balance}}</td>
-                              </tr>
-                              @endforeach
-                            </tbody>
-                        </table>
-                    </div>
 
 
                 </div>
 
                 <div class="modal-footer" style="text-align: right">
-                    <button class="btn btn-yellow add_debt" type="button">Submit</button>
+                    <button class="btn btn-yellow add_regular" type="button">Add</button>
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
 
             </div>
         </div>
     </div>
-    <!-- End Add Debtor Modal -->
+    <!-- End Add Regular Modal -->
 
-    <br>
+    <!-- Add Promo Modal-->
+    <div id="addPromoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header blue-bg yellow">
+                    <h5 class="modal-title">Add Promo Load Order</h5>
+                    <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="saveform_errList"></div>
+                    <div class="form-group">
+                        <label class="form-label mt-4">Promo Name</label>
 
-    <div class="container" style="margin-top: 10px">
-        <div class="row">
-            <div class="col-2">
-                <button class="btn btn-yellow" type="button" onclick="document.location='{{ route('admin.transactions') }}'">View Transactions</button>
-            </div>
-        </div>
+                            <input type="text" class="form-control" placeholder="Product Name" name="prodName" id="prodName">
+                    </div>
 
-    </div>
 
-    <div class="container" style="margin-top: 10px">
-        <div class="row">
-            <div class="col-6">
-                <div class="card text-white mb-3 blue-bg">
-
-                    <div class="card-body yellow">
-                        <h3>Product</h3>
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-6 ">
-                                <!-- <form action="{{route('admin.search')}}" type = "get"> -->
-                                <div class="form-group">
-                                    <label for="">Search</label>
-                                    <div class="input-group mb-3">
-                                        <button id = "btnSearch" class="input-group-text" type="submit"><i class="fas fa-search"></i></button>
-
-                                        <input type="text" id = "search" name="search" class="form-control" placeholder="Search">
-                                    </div>
-                                </div>
-
-                                <!-- </form> -->
-                            </div>
-                            <div class="col-6">
-                                <!-- <form action="{{route('admin.search')}}" type = "get"> -->
-                                <div class="form-group">
-                                    <label for="">Quantity</label>
-                                    <div class="input-group mb-3">
-                                        <input type="number" id = "quantity" name="quantity" class="form-control" min="1" value="1">
-                                    </div>
-                                </div>
-
-                                <!-- </form> -->
-                            </div>
+                    <div class="row">
+                        <div class="col">
+                          <div class="form-group">
+                              <label class="form-label mt-4">Price</label>
+                              <div class="input-group mb-3">
+                                  <input type="number" class="form-control" placeholder="0.00" name="regularPrice" id="regularPrice" min="1.00" readonly>
+                              </div>
+                          </div>
                         </div>
-
-                        <div class="row">
-                            <div class="container">
-                            <table class="table table-hover" id="productTable" >
-                                <thead>
-                                <tr class="table-yellow" style="text-align: center">
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                                </thead>
-                                <tbody id="productBody">
-
-                                </tbody>
-                            </table>
-                            </div>
+                        <div class="col">
+                          <div class="form-group">
+                              <label class="form-label mt-4">Markup</label>
+                              <div class="input-group mb-3">
+                                  <input type="number" class="form-control" placeholder="0.00" name="markUp" id="markUp" min="1.00" readonly>
+                              </div>
+                          </div>
                         </div>
 
                     </div>
-
-                    <!-- <div class="card-footer" style="text-align: right">
-                        <button class="btn btn-primary" type="button">Cancel</button>
-                        <button  class="btn btn-yellow" type="button" >Add</button>
-                    </div> -->
 
                 </div>
-            </div>
 
-            <div class="col-6">
-                <div class="card text-white mb-3 blue-bg">
-                    <form method="POST" action="{{route('admin.storeTransaction')}}" id="addtransact" enctype="multipart/form-data">
-                    @csrf
-                    <div class="card-body yellow">
-                        <div class="row">
-                            <div class="col-4">
-                                <h3 class="yellow">Invoice</h3>
-                            </div>
-                            <div id="transactionMessage"></div>
-                            <div class="col" hidden>
-                                <div class="form-group row">
-                                    <label for="personInCharge" class="col col-form-label">Person In Charge</label>
-                                    <div class="col">
-                                        <input id = "personInCharge" class="form-control" readonly value="{{ Auth::user()->UserID }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <div class="row">
-                            <div class="container">
-                                <table id = "invoiceTable" class="table table-hover table-light">
-
-
-
-                                    <thead>
-                                    <tr class="table yellow">
-                                        <th scope = "col">Product</th>
-                                        <th scope = "col">Price</th>
-                                        <th scope = "col">Quantity</th>
-                                        <th scope = "col">Sub Total</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                </table>
-
-                                <hr>
-
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="form-group row">
-                                            <label for="total" class="col-sm-7 col-form-label">Total</label>
-                                            <div class="col-sm-5">
-                                                <input id = "total" class="form-control" placeholder="0.00" readonly>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label for="cash" class="col-sm-7 col-form-label">Cash</label>
-                                            <div class="col-sm-5">
-                                                <input name="cash" id = "cash" oninput="calculateChange()" type="number" min="0" class="form-control" placeholder="0.00" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label for="change" class="col-sm-7 col-form-label">Change</label>
-                                            <div class="col-sm-5">
-                                                <input id = "change" class="form-control" placeholder="0.00" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="card-footer" style="text-align: right">
-                        <a href="{{route('admin.addtransaction')}}" class="btn btn-primary">Clear</a>
-                        <button type="button" class="btn btn-yellow storeTransaction">Submit</button>
-                        &nbsp;
-                        </form>
-                        <!-- <button onclick="reloadInvoice()" class = "btn btn-primary">Clear</button> -->
-                    </div>
-
-
+                <div class="modal-footer" style="text-align: right">
+                    <button class="btn btn-yellow add_product" type="button">Add</button>
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
+
             </div>
         </div>
     </div>
+
+    <!--End of Promo Modal-->
 
     <script>
         //format should be year/month/date
@@ -413,7 +320,8 @@
             products,
             'PersonInCharge': $('#personInCharge').val(),
             'ModeOfPayment': 'Cash',
-
+            'AmountDue': $('#total').val(),
+            'AmountPaid': $('#cash').val()
             }
 
             $.ajaxSetup({
@@ -455,15 +363,14 @@
         }
 
         function storeDebt(){
-            var balance = $('#total').val() - $('#cash').val();
             var data = {
-
             products,
             'PersonInCharge': $('#personInCharge').val(),
             'ModeOfPayment': 'Cash',
-            'Balance': balance,
+            'AmountDue': $('#total').val(),
             'AmountPaid': $('#cash').val(),
             'DebtorName': $('#debtName').val(),
+            'ContactNumber': $('#debtNum').val(),
             }
 
             $.ajaxSetup({
@@ -517,16 +424,8 @@
         });
 
         $(document).on('click', '.add_debt', function(e){
-            var total = $('#total').val();
-            var cash = $('#cash').val();
             e.preventDefault();
-            if (cash < (total/2)) {
-                console.log("need more downpayment!");
-            } else {
-                storeDebt();
-            }
-
-
+            storeDebt();
 
         });
 

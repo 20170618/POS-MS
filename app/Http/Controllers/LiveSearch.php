@@ -27,15 +27,15 @@ class LiveSearch extends Controller
          ->orWhere('Category','like','%'.$query.'%')
          ->orderBy('ProductID', 'desc')
          ->get();
-         
+
       }
       else
       {
        $data = DB::table('product')
          ->join('categories', 'product.Category','=','categories.CategoryID')
          ->select('product.*','categories.*','product.Description as prodDesc')
-         ->orderBy('ProductID', 'desc') 
-         ->paginate(5);
+         ->orderBy('ProductID', 'desc')
+         ->get();
       }
       $total_row = $data->count();
       if($total_row > 0)
@@ -50,7 +50,7 @@ class LiveSearch extends Controller
          <td>'.$row->Stock.'</td>
          <td>'.$row->CategoryName.'</td>
          <td><button class="btn btn-info editProduct" value="'.$row->ProductID.'" style="margin-right:2%"><i class="fas fa-pen"></i></button><button class="btn btn-danger deleteProduct" value="'.$row->ProductID.'"><i class="fas fa-trash"></i></button></td>
-         
+
         </tr>
         ';
        }

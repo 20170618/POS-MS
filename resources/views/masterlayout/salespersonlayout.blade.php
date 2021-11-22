@@ -12,17 +12,17 @@
         @yield('title',"Point of Sale Migui's Store")
 
         </title>
-        
+
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
         <link href="../../css/bootstrap.css" rel="stylesheet">
         <link href="../../css/sidebar.css" rel="stylesheet">
-        
-        <script src="https://kit.fontawesome.com/ad9a071612.js" crossorigin="anonymous"></script>    
-        
+
+        <script src="https://kit.fontawesome.com/ad9a071612.js" crossorigin="anonymous"></script>
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-        
+
         <script src="../../js/sidebar.js"></script>
     </head>
 
@@ -35,22 +35,22 @@
                 <div style="text-align: center; margin-top: 10px;">
                   <div class="container-fluid d-flex align-items-center">
                     <div class="row " style="height: 100%">
-                        
+
                         <div class="row d-flex align-items-center" >
                             <div class="col d-block text-center">
-        
+
                             <img class="" src="../../images/migui store.png" alt="migui store" style="width: 70%">
                             <br>
                             <br>
-                            
-                            </div>                 
+
+                            </div>
                         </div>
                     </div>
                   </div>
                 </div>
 
                 <li class="nav-item" style="text-align: center">
-                    
+
                     <i class="fas fa-calendar-alt fa-lg gray" style="margin-right: 10px"></i>
                     <span id="demo"></span>
                 </li>
@@ -82,8 +82,15 @@
                     Transactions
                   </a>
                 </li>
-              </ul>
-              
+
+                <li>
+                    <a href="{{ route('salesperson.eload') }}">
+                      <i class="fas fa-mobile-alt fa-2x gray" style="margin-right: 2rem"></i>
+                      E-Load
+                    </a>
+                  </li>
+
+                </ul>
               <hr style="margin-top: 5rem">
               <div>
                 <ul class="nav nav-pills flex-column">
@@ -102,7 +109,7 @@
                 </ul>
               </div>
         </div>
-    
+
         <!-- Page content -->
         <div class="content">
             <div class="row" >
@@ -115,6 +122,6 @@
                 @yield('content')
 
             </div>
-        </div>        
+        </div>
     </body>
 </html>

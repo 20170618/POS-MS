@@ -16,18 +16,13 @@ class CreateProductsSeeder extends Seeder
     {
         /*
             Category:
-            1 Frozen Food
-            2 Dairy
-            3 Prime Commodities
-            4 Laundry
-            5 Personal Care
-            6 School Supplies
-            7 Liquor
-            8 Cigarettes
-            9 E-Load & SIM
+            E-Load Regular
+            E-load Promo
+            Consumable
+            Non-
         */
         $product = [
-            
+
             [
                 'ProductName' => 'Porkchop',
                 'Category' => '1', //CategoryID

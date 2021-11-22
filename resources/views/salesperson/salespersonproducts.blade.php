@@ -7,111 +7,72 @@
 
 @section('content')
 
-<div class="container" style="margin-top: 10px">
-        
+<center>
 
-    <div class="row">
-        <div class="col">
-            <div class="card text-white mb-3 blue-bg" style="max-width: 20rem;">
-            
-                <div class="card-body" style="text-align: center">
-                    <i class="fas fa-utensils fa-5x"></i>
-                    
+<div class="row" style="margin-top: 10px">
+                    @foreach ($categories as $category)
+
+
+                    <div class="col-4">
+
+                        <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                            <button class="btn btn-blue view_product2" style="align-items: center" value="{{$category->CategoryID}}" id="view_product2">
+                            <div class="card-body" style="text-align: center">
+                                <h6 style="text-align: center"><b>{{$category->CategoryName}}</b></h6>
+                            </div>
+                        </button>
+                        </div>
+
+                    </div>
+                    @endforeach
                 </div>
-                    &nbsp;
 
-                    <h4 style="text-align: center"><b>FOOD</b></h4>
+                <hr>
 
-                    &nbsp;
+    </center>
 
-                <div class="card-footer" style="text-align: center">
-                    <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#viewFoodModal">View</button>
+                <a><h5>Search Product</h5></a>
+                <div class="form-group">
+                    <div class="form-group" style="width: 20rem;">
+                        <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search" name="search" class="form-control" placeholder="Search">
+                        </div>
+                    </div>
+
+                <div class="container">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col" style="width: 20rem;">Description</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="searchBody">
+
+                        </tbody>
+                    </table>
                 </div>
-                
+
+                </div>
+
             </div>
-        </div>
 
-        <div class="col">
-            <div class="card text-white mb-3 blue-bg" style="max-width: 20rem;">
-            
-                <div class="card-body" style="text-align: center">
-                    <i class="fas fa-air-freshener fa-5x"></i>
-                    
-                </div>
-                    &nbsp;
-
-                    <h4 style="text-align: center"><b>NON-FOOD</b></h4>
-
-                    &nbsp;
-
-                <div class="card-footer" style="text-align: center">
-                <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#viewnonFoodModal">View</button>
-                </div>
-                
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="card text-white mb-3 blue-bg" style="max-width: 20rem;">
-            
-                <div class="card-body" style="text-align: center">
-                    <i class="fas fa-mobile-alt fa-5x"></i>
-                    
-                </div>
-                    &nbsp;
-
-                    <h4 style="text-align: center"><b>E-LOAD</b></h4>
-
-                    &nbsp;
-
-                <div class="card-footer" style="text-align: center">
-                <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#viewELoadModal">View</button>
-                </div>
-                
-            </div>
-        </div>
-
-    </div>
-
-    <hr>
-
-    <a><h5>Search Product</h5></a>
-    <div class="form-group">
-
-    <div class="input-group mb-3" style="width: 20rem">
-        <input type="text" name="search" id="search" class="form-control" placeholder="Search" />
-    </div>
-
-    <div class="container">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Price</th>
-                <th scope="col">Category</th>
-            </tr>
-            </thead>
-            <tbody id="searchBody">
-
-            </tbody>
-        </table>
-    </div>
-
-    </div>
-
-</div>
-
-@extends('salesperson.productsmodal')
+    @extends('salesperson.productsmodal')
     <script src="../../js/products.js"></script>
     <script>
         $(document).ready(function(){
-        
-        // fetch_customer_data();
-        
+
+        //fetch_customer_data();
+
          function fetch_customer_data(query = '')
          {
           $.ajax({
-           url:"{{ route('product_search.action') }}",
+           url:"{{ route('products_search.action') }}",
            method:'GET',
            data:{query:query},
            dataType:'json',
@@ -122,11 +83,71 @@
            }
           })
          }
-        
+
          $(document).on('keyup', '#search', function(){
           var query = $(this).val();
           fetch_customer_data(query);
          });
         });
+
+        var categoryClick = 0;
+
+
+        // SEACRCH UNDER PRODUCT CATEGORY
+        $(document).on('keyup','#productName', function () {
+            var query = $(this).val();
+
+            var data = {
+                'cID': parseInt(categoryClick),
+                'query': query
+            };
+
+            console.log(data);
+
+            $.ajax({
+                type: "GET",
+                url: "searchProductUnderCat",
+                data: data,
+                dataType: "json",
+                success: function (response) {
+
+                    //success
+                    if(response.status=200){
+                        var len = response.products.length;
+                        console.log(response.products);
+                        $("#productsTable tbody").empty();
+                        for (var i = 0; i < len; i++) {
+                            var id = response.products[i].ProductID;
+                            var productN = response.products[i].ProductName;
+                            var productP = response.products[i].Price;
+                            var productS = response.products[i].Stock;
+                            var productD = response.products[i].Description;
+
+                            var tr_str = "<tr style='text-align: center'>" +
+                            "<td align='center'>" + productN + "</td>" +
+                            "<td align='center'>" + productD + "</td>" +
+                            "<td align='center'>" + productP + "</td>" +
+                            "<td align='center'>" + productS + "</td>" +
+                            "</tr>";
+
+                            $("#productsTable tbody").append(tr_str);
+                        }
+                    }
+                }
+            });
+
+        });
+
     </script>
+
+    @if ($message = Session::get('success'))
+        <script>
+            console.log('{{$message}}');
+            Swal.fire(
+                'Success!',
+                '{{$message}}',
+                'success'
+            )
+        </script>
+    @endif
 @endsection

@@ -29,11 +29,11 @@
             </div>
             <div class="col">
                 <div class="form-group">
-            
+
                     <div class="form-group" style="width: 20rem;">
                       <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search" class="form-control" placeholder="Search"> 
+                        <input type="text" id="search" class="form-control" placeholder="Search">
                       </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                     <thead>
                     <tr style="text-align: center;">
                         <th scope ="col">Sale ID</th>
-                        <th scope ="col">Total</th>
+                        <th scope ="col">Mode of Payment</th>
                         <th scope="col">Date & Time</th>
                         <th scope="col">Person In Charge</th>
                         <th scope="col">Action</th>
@@ -58,7 +58,7 @@
                         <tr style="align-content: center; text-align: center;">
 
                             <th scope="row">{{$sale->SalesID}}</th>
-                            <td>&#8369; {{number_format($sale->AmountDue, 2)}}</td>
+                            <td>{{$sale->ModeOfPayment}}</td>
                             <td>{{$sale->created_at}}</td>
                             <td>{{$sale->FirstName}} {{$sale->LastName}}</td>
                             <td>
@@ -97,8 +97,8 @@
                         <label for="delete_incharge" class="col-sm-3 col-form-label">Salesperson:</label>
                         <input type="text" name="delete_incharge" id="delete_incharge" value="" disabled>
 
-                </div> 
-            
+                </div>
+
                 <div class="modal-footer" style="text-align: right">
                     <button class="btn btn-yellow delete_transaction_btn" type="button">Confirm</button>
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -111,10 +111,10 @@
 
     <script>
         $(document).ready(function(){
-            
-            
+
+
             fetch_data();
-            
+
             //fetch all records
             function fetch_data(query=''){
                 $.ajax({
@@ -179,7 +179,7 @@
                 //$('#pizza_message').text(response.message);
                 $('#deleteModal').modal('hide');
                 //window.location = window.location;
-                
+
                 Swal.fire(
                     "Deleted",
                 "The sales record has been deleted.",
@@ -192,8 +192,8 @@
         });
         // End Delete
 
-        
+
     </script>
-        
+
 
 @endsection

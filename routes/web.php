@@ -23,7 +23,7 @@ use App\Http\Controllers\LiveSearch;
 //      return view('auth.firstSetup');
 //  });
 //  Route::get('/', [HomeController::class, 'firstrun'])->name('setup');
- 
+
 Route::get('/test',[HomeController::class, 'createPDF']);
 
 
@@ -46,14 +46,14 @@ Route::get('/test',[HomeController::class, 'createPDF']);
 //     return view('firstSetup');
 //      });
 
-Route::get('/reportPreview', function () {  
+Route::get('/reportPreview', function () {
     return view('reportPreview');
      });
- 
-     Route::get('/exportToPDF', function () {  
+
+     Route::get('/exportToPDF', function () {
         return view('exportToPDF');
          });
-     
+
 
 
 Auth::routes(['verify' => true]);
@@ -93,6 +93,8 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::get('transactions/edit/{id}', [HomeController::class, 'editTransaction'])->name('admin.editTransaction');
     Route::put('transactions/update/{id}', [HomeController::class, 'updateTransaction'])->name('admin.updateTransaction');
 
+    Route::get('eload', [HomeController::class, 'adminEload'])->name('admin.eload');
+
     Route::get('searchUnderCategory', [HomeController::class, 'action']);
 
     Route::get('deleteTransaction/{id}', [HomeController::class, 'deleteTransaction']);
@@ -123,14 +125,17 @@ Route::group(['middleware'=>['roleCheckUser','auth']], function(){
     Route::get('addTransaction', [HomeController::class, 'salespersonAddTransactions'])->name('salesperson.salespersonaddtransaction');
     Route::get('search', [HomeController::class, 'action'])->name('salesperson.search');
     Route::post('addTransaction/store', [HomeController::class, 'storeTransaction'])->name('salesperson.storeTransaction');
-    
+
     Route::get('viewtransactions', function () {
         return view('salesperson.viewtransaction');
     });
-    
+
     Route::get('salespersonproducts', [HomeController::class, 'salespersonProducts'])->name('salesperson.salespersonproducts');
     Route::get('/product_search/action', [LiveSearch::class, 'action'])->name('product_search.action');
-    
+    Route::get('salesPersonEload', [HomeController::class, 'salesPersonEload'])->name('salesperson.eload');
+    Route::get('searchProductUnderCat', [HomeController::class, 'searchUnderCategory']);
+    Route::get('products/view-products/{id}', [ProductController::class, 'view']);
+
 });
 
 //  Route::post('transactions/store', [HomeController::class, 'storeTransaction'])->name('admin.storeTransaction');

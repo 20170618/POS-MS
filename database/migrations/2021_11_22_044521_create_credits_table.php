@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ArchivedRecords extends Migration
+class CreateCreditsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class ArchivedRecords extends Migration
      */
     public function up()
     {
-        Schema::create('ArchivedRecords', function (Blueprint $table) {
+        Schema::create('credits', function (Blueprint $table) {
             $table->unsignedBigInteger('SalesID');
-            $table->timestamps();
-
+            $table->dateTime('BalancePayDate')->nullable();
+            $table->string('Debtor');
+            $table->double('Balance', 8, 2);
+            $table->double('InitialPayment', 8, 2);
+            
             $table->foreign('SalesID')->references('SalesID')->on('sales');
-
         });
     }
 
@@ -29,7 +31,6 @@ class ArchivedRecords extends Migration
      */
     public function down()
     {
-        //
-        Schema::dropIfExists('ArchivedRecords');
+        Schema::dropIfExists('credits');
     }
 }

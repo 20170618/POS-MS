@@ -17,7 +17,7 @@ class CreateSalesDetailsTable extends Migration
             $table->unsignedBigInteger('SalesID');
             $table->unsignedBigInteger('ProductID');
             $table->integer('Quantity');
-            $table->integer('LoadAmount');
+            $table->integer('LoadAmount')->nullable();
             $table->timestamps();
 
             $table->foreign('SalesID')->references('SalesID')->on('Sales');

@@ -43,7 +43,7 @@ $(document).on('click', '.add_product', function (e) {
         ).then(function(){
           window.location = window.location;
         });
-        
+
       }
     }
   });
@@ -54,7 +54,7 @@ $(document).on('click', '.add_product', function (e) {
 $(document).on('click', '.view_product', function (e) {
   e.preventDefault();
   categoryClick = $(this).val();
-            console.log(categoryClick);
+  console.log(categoryClick);
   var c_id = $(this).val();
   $("#productsTable tbody").html('');
   $('#viewProductModal').modal('show');
@@ -78,6 +78,41 @@ $(document).on('click', '.view_product', function (e) {
           "<td align='center'>" + productS + "</td>" +
           "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
           "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+          "</tr>";
+
+        $("#productsTable tbody").append(tr_str);
+      }
+
+
+    }
+  });
+});
+
+$(document).on('click', '.view_product2', function (e) {
+  e.preventDefault();
+  categoryClick = $(this).val();
+  console.log(categoryClick);
+  var c_id = $(this).val();
+  $("#productsTable tbody").html('');
+  $('#viewProductModal').modal('show');
+  $.ajax({
+    type: "GET",
+    url: "products/view-products/" + c_id,
+    success: function (data) {
+      var len = data.products.length;
+
+      for (var i = 0; i < len; i++) {
+        var id = data.products[i].ProductID;
+        var productN = data.products[i].ProductName;
+        var productP = data.products[i].Price;
+        var productS = data.products[i].Stock;
+        var productD = data.products[i].Description;
+
+        var tr_str = "<tr style='text-align: center'>" +
+          "<td align='center'>" + productN + "</td>" +
+          "<td align='center'>" + productD + "</td>" +
+          "<td align='center'>" + productP + "</td>" +
+          "<td align='center'>" + productS + "</td>" +
           "</tr>";
 
         $("#productsTable tbody").append(tr_str);

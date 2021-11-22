@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -32,7 +33,7 @@
             src: url(https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
             unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
             }
-            
+
            body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
@@ -44,7 +45,7 @@
             }
 
             .button {
-            background-color:#008CBA; 
+            background-color:#008CBA;
             border: none;
             color: white;
             padding: 15px 32px;
@@ -62,7 +63,7 @@
             text-align: left;
             }
             table {
-           
+
             border-collapse: collapse;
             width: 100%;
             }
@@ -103,24 +104,36 @@
             }
 
 
-          
+
        </style>
 
-    </head>
 
-    <body>
-    <div style="container-sm">
-            <h1>REPORT PREVIEWS</h1>
+
+</head>
+<body>
+<h1>REPORT PREVIEWS</h1>
+    <br>
+    <center>
+        <div id="chartContainer" style="height: 400px; width: 80%;"></div>
+        <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </center>
+
+
+
+
+
+
             <a class="button" href="{{ URL::to('/test') }}" style='float:right'>
                 Export to PDF
             </a>
             <center>
-                
+            <div style="height: 500px; width: 80%;">
                         <br>
-                        
+
                                 <div class="d-flex justify-content-end mb-4">
-                                    
-                                </div> 
+
+                                </div>
 
                                         <table class="table table-bordered mb-5">
                                             <thead>
@@ -132,22 +145,60 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- foreach -->
-                                                <tr>    
-                                                    <td>sample</td>
+
+                                                <tr>
+                                                    <td></td>
                                                     <td>sample</td>
                                                     <td>sample</td>
                                                     <td>sample</td>
                                                 </tr>
-                                                <!-- endforeach     -->
-                                            </tbody>      
+
+                                            </tbody>
 
                                         </table>
-                        
+
         </div>
-    </center>   
-       
-        
-             
-    </body> 
+    </center>
+
+    <script>
+         window.onload = function() {
+
+            var dataPoints = [];
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Daily Sales Data"
+                },
+                axisY: {
+                    title: "Units",
+                    titleFontSize: 24,
+                    includeZero: true
+                },
+                data: [{
+                    type: "column",
+                    yValueFormatString: "#,### Units",
+                    dataPoints: dataPoints
+                }]
+            });
+
+            function addData(data) {
+                for (var i = 0; i < data.length; i++) {
+                    dataPoints.push({
+                        x: new Date(data[i].date),
+                        y: data[i].units
+                    });
+                }
+                chart.render();
+
+            }
+
+            $.getJSON("https://canvasjs.com/data/gallery/javascript/daily-sales-data.json", addData);
+
+            }
+
+    </script>
+
+    </body>
 </html>
