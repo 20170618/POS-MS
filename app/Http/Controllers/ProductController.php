@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Redirect,Response;
@@ -58,10 +57,9 @@ class ProductController extends Controller
         //
         $validator = Validator::make($request->all(), [
             'ProductName' =>['required', 'max:50', 'regex:/^[a-zA-Z0-9 ]+$/'],
-            'Price' =>'required|min:1',
+            'Price' =>'required|min:1.00',
             'Category' =>'required',
-            'Stock' => 'required',
-            'Description' => 'required|max:255',
+            'Stock' => ['required', 'min:0.00'],
         ]);
 
         if($validator->fails()){
@@ -76,7 +74,6 @@ class ProductController extends Controller
             $product->Price = $request->input('Price');
             $product->Category = $request->input('Category');
             $product->Stock = $request->input('Stock');
-            $product->Description = $request->input('Description');
             $product->save();
             return response()->json([
                 'status'=>200,
@@ -106,12 +103,11 @@ class ProductController extends Controller
     {
         //
         $product = Product::find($id);
-        $category = Category::find($product->Category);
+
         if($product){
             return response()->json([
                 'status'=>200,
                 'product'=>$product,
-                'category'=>$category,
             ]);
         }else{
             return response()->json([
@@ -137,9 +133,8 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ProductName' =>'required|max:191',
-            'Price' =>'required|max:191',
-            'Stock' =>'required',
-            'Description' => 'required'
+            'Price' =>'required|min:1.00',
+            'Stock' => ['required', 'min:0.00'],
         ]);
 
         if($validator->fails())
@@ -157,7 +152,6 @@ class ProductController extends Controller
                 $product->ProductName = $request->input('ProductName');
                 $product->Price = $request->input('Price');
                 $product->Stock = $request->input('Stock');
-                $product->Description = $request->input('Description');
                 $product->update();
                 return response()->json([
                     'status'=>200,

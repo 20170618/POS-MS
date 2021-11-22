@@ -103,28 +103,22 @@ class HomeController extends Controller
 
     public function adminProducts()
     {
-        $categories = DB::table('categories')
-            ->select()
-            ->get();
         $products = DB::table('product')
-            ->join('categories', 'product.Category','=','categories.CategoryID')
+
             ->select()
             ->get();
 
-        return view('admin.products', compact('categories','products'));
+        return view('admin.products', compact('products'));
     }
 
     public function salesPersonProducts()
     {
-        $categories = DB::table('categories')
-            ->select()
-            ->get();
         $products = DB::table('product')
-            ->join('categories', 'product.Category','=','categories.CategoryID')
-            ->select()
-            ->get();
 
-        return view('salesperson.salespersonproducts', compact('categories','products'));
+        ->select()
+        ->get();
+
+        return view('salesperson.salespersonproducts', compact('products'));
     }
 
     public function adminTransactions()
@@ -315,34 +309,43 @@ class HomeController extends Controller
                 'errors'=>$validator->errors()->all(),
             ]);
         }else{
-            $sales= new Sales;
-            $sales->PersonInCharge = $request->input('PersonInCharge');
-            $sales->ModeOfPayment = 'Credit';
-            $sales->save();
-            $id = $sales->SalesID;
+            if(DB::table('credits')->where('Debtor',$request->input('DebtorName'))->exists()){
+                return response()->json([
+                    'status'=>20012,
+                    'message'=>'Debtor has outstanding balance! Transaction failed!',
+                ]);
+            }else{
+                $sales= new Sales;
+                $sales->PersonInCharge = $request->input('PersonInCharge');
+                $sales->ModeOfPayment = 'Credit';
+                $sales->save();
+                $id = $sales->SalesID;
 
-            $debtor=new Credit;
-            $debtor->SalesID =$id;
-            $debtor->Debtor = $request->input('DebtorName');
-            $debtor->Balance = $request->input('Balance');
-            $debtor->InitialPayment= $request->input('AmountPaid');
-            $debtor->save(); // store new debtor into db
+                $debtor=new Credit;
+                $debtor->SalesID =$id;
+                $debtor->Debtor = $request->input('DebtorName');
+                $debtor->Balance = $request->input('Balance');
+                $debtor->InitialPayment= $request->input('AmountPaid');
+                $debtor->save(); // store new debtor into db
 
-            $data = $request->input('products');
+                $data = $request->input('products');
 
-            foreach ($data as $data_ID) {
-                $salesDetails = new SalesDetails;
-                $salesDetails->SalesID = $id;
-                $salesDetails->ProductID = $data_ID['id'];
-                $salesDetails->Quantity = $data_ID['quantity'];
-                $salesDetails->LoadAmount = $data_ID['quantity'];
-                $salesDetails->save();
+                foreach ($data as $data_ID) {
+                    $salesDetails = new SalesDetails;
+                    $salesDetails->SalesID = $id;
+                    $salesDetails->ProductID = $data_ID['id'];
+                    $salesDetails->Quantity = $data_ID['quantity'];
+                    $salesDetails->LoadAmount = $data_ID['quantity'];
+                    $salesDetails->save();
+                }
+
+                return response()->json([
+                    'status'=>200,
+                    'message'=>'Debt Record Added Successfully',
+                ]);
             }
 
-            return response()->json([
-                'status'=>200,
-                'message'=>'Debt Record Added Successfully',
-            ]);
+            
         }
     }
 
@@ -390,7 +393,7 @@ class HomeController extends Controller
 
         try{
             $products = DB::table('product')
-            ->whereRaw("((Category = $cID) AND (ProductName LIKE '%$query%' OR Price LIKE '%$query%' OR Stock LIKE '%$query%'))")
+            ->whereRaw("((Category = '$cID') AND (ProductName LIKE '%$query%' OR Price LIKE '%$query%' OR Stock LIKE '%$query%'))")
             ->get();
 
             return response()->json([
@@ -574,14 +577,14 @@ class HomeController extends Controller
             $query = $request->get('query');
             if($query != ''){
                 $data = DB::table('product')
-                    ->join('categories','product.Category','=','categories.CategoryID')
-                    ->where('CategoryName','NOT LIKE','%E Load%')
+                    ->where('Category','NOT LIKE','%E-Load%')
                     ->where('ProductName', 'LIKE', '%'.$query.'%')
+                    ->orWhere('Category', 'LIKE', $query.'%')
                     ->orderBy('ProductName', 'desc')
                     ->take(7)
                     ->get();
             }else{
-                $data = DB::table('product')->take(7)->get();
+                $data = DB::table('product')->where('Category','NOT LIKE','%E-Load%')->take(7)->get();
             }
 
             $total_row = $data->count();
@@ -591,6 +594,7 @@ class HomeController extends Controller
                     $output .= '
                     <tr style = "color:white;">
                         <td>'.$row->ProductName.'</td>
+                        <td>'.$row->Category.'</td>
                         <td style = "text-align:center;">'.number_format($row->Price, 2).'</td>
                         <td style = "text-align:center;"><button onclick="addToInvoice(\' '.$row->ProductName.' \', \' '.$row->Price.' \' ,\' '.$row->ProductID.' \' )" class = "btn btn-primary" id = "add"> Add </button></td>
                     </tr>
@@ -671,8 +675,8 @@ class HomeController extends Controller
     }
 
     public function debtorsRecordView($id){
-        $debtor = DB::table('sales')
-            ->where('Debtor','=',$id)
+        $debtor = DB::table('credits')
+            ->where('SalesID','=',$id)
             ->get();
 
         if($debtor){
@@ -711,55 +715,52 @@ class HomeController extends Controller
             ->where('UserType','=','admin')
             ->orWhere('UserType','=','user')
             ->get();
-        $categories = DB::table('categories')
-            ->select()
-            ->get();
-        return view('admin.reports', compact('salespersons','categories'));
+        return view('admin.reports', compact('salespersons'));
     }
 
 
 
-    public function createPDF(){
-        // retrieve all records from db
-        $now = Carbon::now();
-        // $check = $request->input('checkedRadio');
+    // public function createPDF(){
+    //     // retrieve all records from db
+    //     $now = Carbon::now();
+    //     // $check = $request->input('checkedRadio');
 
-        // if($check =='MonthlyRadio'){
-        //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
-        //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
+    //     // if($check =='MonthlyRadio'){
+    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
+    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
 
-        //     $transactions=DB::table('sales')
-        //         ->whereBetween('created_at', [$startDate, $endDate])
-        //         ->get();
+    //     //     $transactions=DB::table('sales')
+    //     //         ->whereBetween('created_at', [$startDate, $endDate])
+    //     //         ->get();
 
-        //     echo $transactions;
+    //     //     echo $transactions;
 
-        // }else if($check=='AnnualRadio'){
-        //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
-        //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
+    //     // }else if($check=='AnnualRadio'){
+    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
+    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
 
-        //     $transactions=DB::table('sales')
-        //         ->whereBetween('created_at', [$startDate, $endDate])
-        //         ->get();
+    //     //     $transactions=DB::table('sales')
+    //     //         ->whereBetween('created_at', [$startDate, $endDate])
+    //     //         ->get();
 
-        //     echo $transactions;
-        // }else if($check=='DailyRadio'){
-        //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
-        //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
+    //     //     echo $transactions;
+    //     // }else if($check=='DailyRadio'){
+    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
+    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
 
-        //     $transactions=DB::table('sales')
-        //         ->whereBetween('created_at', [$startDate, $endDate])
-        //         ->get();
+    //     //     $transactions=DB::table('sales')
+    //     //         ->whereBetween('created_at', [$startDate, $endDate])
+    //     //         ->get();
 
-        //     echo $transactions;
-        // }
-        // share data to view
+    //     //     echo $transactions;
+    //     // }
+    //     // share data to view
 
-        $data="sample";
-         $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
+    //     $data="sample";
+    //      $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
 
 
-        return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
-    }
+    //     return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
+    // }
 }
 

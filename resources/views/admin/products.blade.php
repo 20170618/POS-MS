@@ -9,29 +9,62 @@
 
     <div class="container" style="margin-top: 10px">
         <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
- <center>
+
         <div class="row" style="margin-top: 10px">
-            @foreach ($categories as $category)
 
 
-            <div class="col-4">
+            <div class="col-6">
 
                 <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                    <button class="btn btn-blue view_product" style="align-items: center" value="{{$category->CategoryID}}" id="view_product">
+                    <button class="btn btn-blue view_product" style="align-items: center" value="Consumable" id="view_product">
                     <div class="card-body" style="text-align: center">
-                        <h6 style="text-align: center"><b>{{$category->CategoryName}}</b></h6>
+                        <h6 style="text-align: center"><b>Consumable</b></h6>
                     </div>
                 </button>
                 </div>
 
             </div>
-            @endforeach
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product" style="align-items: center" value="Non-Consumable" id="view_product">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>Non-Consumable</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product" style="align-items: center" value="E-Load Regular" id="view_product">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>E-Load Regular</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product" style="align-items: center" value="E-Load Promo" id="view_product">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>E-Load Promo</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
         </div>
 
         <hr>
 
 
-</center>
 
         <a><h5>Search Product</h5></a>
         <div class="form-group">
@@ -47,7 +80,6 @@
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col" style="width: 20rem;">Description</th>
                     <th scope="col">Price</th>
                     <th scope="col">Stock</th>
                     <th scope="col">Category</th>
@@ -91,7 +123,7 @@
          });
         });
 
-        var categoryClick = 0;
+        var categoryClick = '';
 
 
         // SEACRCH UNDER PRODUCT CATEGORY
@@ -99,7 +131,7 @@
             var query = $(this).val();
 
             var data = {
-                'cID': parseInt(categoryClick),
+                'cID': categoryClick,
                 'query': query
             };
 
@@ -114,19 +146,18 @@
 
                     //success
                     if(response.status=200){
-                        var len = response.products.length;
                         console.log(response.products);
+                        var len = response.products.length;
+                        
                         $("#productsTable tbody").empty();
                         for (var i = 0; i < len; i++) {
                             var id = response.products[i].ProductID;
                             var productN = response.products[i].ProductName;
                             var productP = response.products[i].Price;
                             var productS = response.products[i].Stock;
-                            var productD = response.products[i].Description;
 
                             var tr_str = "<tr style='text-align: center'>" +
                             "<td align='center'>" + productN + "</td>" +
-                            "<td align='center'>" + productD + "</td>" +
                             "<td align='center'>" + productP + "</td>" +
                             "<td align='center'>" + productS + "</td>" +
                             "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+

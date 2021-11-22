@@ -7,60 +7,90 @@
 
 @section('content')
 
-<center>
+    
 
-<div class="row" style="margin-top: 10px">
-                    @foreach ($categories as $category)
-
-
-                    <div class="col-4">
-
-                        <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                            <button class="btn btn-blue view_product2" style="align-items: center" value="{{$category->CategoryID}}" id="view_product2">
-                            <div class="card-body" style="text-align: center">
-                                <h6 style="text-align: center"><b>{{$category->CategoryName}}</b></h6>
-                            </div>
-                        </button>
-                        </div>
-
+<div class="col-6">
+    
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent" >
+                    <button class="btn btn-blue view_product2" style="align-items: center" value="Consumable" id="view_product2">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>Consumable</b></h6>
                     </div>
-                    @endforeach
-                </div>
-
-                <hr>
-
-    </center>
-
-                <a><h5>Search Product</h5></a>
-                <div class="form-group">
-                    <div class="form-group" style="width: 20rem;">
-                        <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search" name="search" class="form-control" placeholder="Search">
-                        </div>
-                    </div>
-
-                <div class="container">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col" style="width: 20rem;">Description</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Stock</th>
-                            <th scope="col">Category</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody id="searchBody">
-
-                        </tbody>
-                    </table>
-                </div>
-
+                </button>
                 </div>
 
             </div>
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product2" style="align-items: center" value="Non-Consumable" id="view_product2">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>Non-Consumable</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product2" style="align-items: center" value="E-Load Regular" id="view_product2">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>E-Load Regular</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
+
+            <div class="col-6">
+
+                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
+                    <button class="btn btn-blue view_product2" style="align-items: center" value="E-Load Promo" id="view_product2">
+                    <div class="card-body" style="text-align: center">
+                        <h6 style="text-align: center"><b>E-Load Promo</b></h6>
+                    </div>
+                </button>
+                </div>
+
+            </div>
+        </div>
+
+        <hr>
+
+        
+
+        <a><h5>Search Product</h5></a>
+        <div class="form-group">
+            <div class="form-group" style="width: 20rem;">
+                <div class="input-group mb-3">
+                  <span class="input-group-text"><i class="fas fa-search"></i></span>
+                  <input type="text" id="search" name="search" class="form-control" placeholder="Search">
+                </div>
+            </div>
+
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Category</th>
+                  
+                  
+                </tr>
+                </thead>
+                <tbody id="searchBody">
+
+                </tbody>
+            </table>
+        </div>
+
+ </div>
+</div>
 
     @extends('salesperson.productsmodal')
     <script src="../../js/products.js"></script>
@@ -72,7 +102,7 @@
          function fetch_customer_data(query = '')
          {
           $.ajax({
-           url:"{{ route('products_search.action') }}",
+           url:"{{ route('salespersonproduct_search.action') }}",
            method:'GET',
            data:{query:query},
            dataType:'json',
@@ -90,7 +120,7 @@
          });
         });
 
-        var categoryClick = 0;
+        var categoryClick = '';
 
 
         // SEACRCH UNDER PRODUCT CATEGORY
@@ -98,7 +128,7 @@
             var query = $(this).val();
 
             var data = {
-                'cID': parseInt(categoryClick),
+                'cID': categoryClick,
                 'query': query
             };
 
@@ -106,7 +136,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "searchProductUnderCat",
+                url: "salespersonsearchProductUnderCat",
                 data: data,
                 dataType: "json",
                 success: function (response) {
@@ -121,11 +151,10 @@
                             var productN = response.products[i].ProductName;
                             var productP = response.products[i].Price;
                             var productS = response.products[i].Stock;
-                            var productD = response.products[i].Description;
+                         
 
                             var tr_str = "<tr style='text-align: center'>" +
                             "<td align='center'>" + productN + "</td>" +
-                            "<td align='center'>" + productD + "</td>" +
                             "<td align='center'>" + productP + "</td>" +
                             "<td align='center'>" + productS + "</td>" +
                             "</tr>";

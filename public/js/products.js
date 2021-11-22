@@ -53,8 +53,8 @@ $(document).on('click', '.add_product', function (e) {
 // View
 $(document).on('click', '.view_product', function (e) {
   e.preventDefault();
+  $('#productName').val("");
   categoryClick = $(this).val();
-  console.log(categoryClick);
   var c_id = $(this).val();
   $("#productsTable tbody").html('');
   $('#viewProductModal').modal('show');
@@ -69,11 +69,9 @@ $(document).on('click', '.view_product', function (e) {
         var productN = data.products[i].ProductName;
         var productP = data.products[i].Price;
         var productS = data.products[i].Stock;
-        var productD = data.products[i].Description;
 
         var tr_str = "<tr style='text-align: center'>" +
           "<td align='center'>" + productN + "</td>" +
-          "<td align='center'>" + productD + "</td>" +
           "<td align='center'>" + productP + "</td>" +
           "<td align='center'>" + productS + "</td>" +
           "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
@@ -90,6 +88,7 @@ $(document).on('click', '.view_product', function (e) {
 
 $(document).on('click', '.view_product2', function (e) {
   e.preventDefault();
+  $('#productName').val("");
   categoryClick = $(this).val();
   console.log(categoryClick);
   var c_id = $(this).val();
@@ -97,7 +96,7 @@ $(document).on('click', '.view_product2', function (e) {
   $('#viewProductModal').modal('show');
   $.ajax({
     type: "GET",
-    url: "products/view-products/" + c_id,
+    url: "salesperson/products/view-products/" + c_id,
     success: function (data) {
       var len = data.products.length;
 
@@ -106,11 +105,9 @@ $(document).on('click', '.view_product2', function (e) {
         var productN = data.products[i].ProductName;
         var productP = data.products[i].Price;
         var productS = data.products[i].Stock;
-        var productD = data.products[i].Description;
 
         var tr_str = "<tr style='text-align: center'>" +
           "<td align='center'>" + productN + "</td>" +
-          "<td align='center'>" + productD + "</td>" +
           "<td align='center'>" + productP + "</td>" +
           "<td align='center'>" + productS + "</td>" +
           "</tr>";
@@ -122,47 +119,6 @@ $(document).on('click', '.view_product2', function (e) {
     }
   });
 });
-
-// Add E-Load
-$(document).on('click', '.add_eLoad', function (e) {
-  e.preventDefault();
-  var data = {
-    'ProductName': $('#eLoadName').val(),
-    'Price': $('#eLoadPrice').val(),
-    'Category': $('#eLoadCategory').val(),
-  }
-  console.log(data);
-  $.ajaxSetup({
-    headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-  });
-
-  $.ajax({
-    type: "POST",
-    url: "products",
-    data: data,
-    dataType: "json",
-    success: function (response) {
-
-      if (response.status == 400) {
-        $('#saveform_errList').html("");
-        $('#saveform_errList').addClass('alert alert-danger');
-        $.each(response.errors, function (key, err_values) {
-          $('saveform_errList').append('<li>' + err_values + '</li>');
-        })
-      } else {
-        $('#saveform_errList').html("");
-        $('#pizza_message').addClass('alert alert-info');
-        $('#pizza_message').text(response.message);
-        $('#addELoadModal').modal('hide');
-        $('#addELoadModal').find('input').val("");
-        window.location = window.location;
-      }
-    }
-  });
-});
-// End Add E-Load
 
 // Delete
 $(document).on('click', '.deleteProduct', function (e) {
@@ -181,7 +137,14 @@ $(document).on('click', '.deleteProduct', function (e) {
       } else {
         $('#delete_productName').val(response.product.ProductName);
         $('#delete_price').val(response.product.Price);
+        $('#delete_stock').val(response.product.Stock);
         $('#delete_p_id').val(p_id);
+
+        if (response.product.Stock == 0) {
+          document.getElementById("delete_product_btn").disabled = true;
+        } else {
+          document.getElementById("delete_product_btn").disabled = false;
+        }
       }
     }
   });
@@ -235,8 +198,7 @@ $(document).on('click', '.editProduct', function (e) {
         $('#edit_productName').val(response.product.ProductName);
         $('#edit_price').val(response.product.Price);
         $('#edit_stock').val(response.product.Stock);
-        $('#edit_category').val(response.category.CategoryName);
-        $('#edit_desc').val(response.product.Description);
+        $('#edit_category').val(response.product.Category);
         $('#edit_p_id').val(p_id);
       }
     }
@@ -251,7 +213,6 @@ $(document).on('click', '.update_product', function (e) {
     'ProductName': $('#edit_productName').val(),
     'Price': $('#edit_price').val(),
     'Stock': $('#edit_stock').val(),
-    'Description': $('#edit_desc').val(),
   }
   console.log(p_id);
   console.log(data);

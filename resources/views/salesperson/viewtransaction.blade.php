@@ -15,7 +15,7 @@
             <!-- <div class="col-6">
                 <button class="btn btn-yellow" type="button">View Debts</button>
             </div> -->
-            <div class="col">
+            <div class="col table-responsive">
                 <div class="form-group">
             
                     <div class="form-group" style="width: 20rem">
@@ -27,6 +27,7 @@
         
                 </div>
             </div>
+
         </div>
 
         
@@ -37,9 +38,9 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Time</th>
-                        <th scope="col">Salesperson</th>
+                        <th scope="col">Sale ID</th>
+                        <th scope="col">Mode of Payment</th>
+                        <th scope="col">Person In Charge</th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>

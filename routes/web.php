@@ -24,7 +24,7 @@ use App\Http\Controllers\LiveSearch;
 //  });
 //  Route::get('/', [HomeController::class, 'firstrun'])->name('setup');
 
-Route::get('/test',[HomeController::class, 'createPDF']);
+
 
 
  if (User::exists()) {
@@ -109,6 +109,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
 
     Route::get('reports', [HomeController::class, 'adminReports'])->name('admin.reports');
     Route::get('reports/generate',[HomeController::class, 'adminGenerateReport']);
+   
     // Route::get('/admin/PDF',[HomeController::class,'createPDF']);
 
     Route::get('admin/transactions/add', function () {
@@ -131,10 +132,10 @@ Route::group(['middleware'=>['roleCheckUser','auth']], function(){
     });
 
     Route::get('salespersonproducts', [HomeController::class, 'salespersonProducts'])->name('salesperson.salespersonproducts');
-    Route::get('/product_search/action', [LiveSearch::class, 'action'])->name('product_search.action');
+    Route::get('salesperson/product_search/action', [LiveSearch::class, 'action2'])->name('salespersonproduct_search.action');
     Route::get('salesPersonEload', [HomeController::class, 'salesPersonEload'])->name('salesperson.eload');
-    Route::get('searchProductUnderCat', [HomeController::class, 'searchUnderCategory']);
-    Route::get('products/view-products/{id}', [ProductController::class, 'view']);
+    Route::get('salespersonsearchProductUnderCat', [HomeController::class, 'searchUnderCategory']);
+    Route::get('salesperson/products/view-products/{id}', [ProductController::class, 'view']);
 
 });
 

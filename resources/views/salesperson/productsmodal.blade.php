@@ -25,7 +25,6 @@
                             <thead style="text-align: center">
                             <tr class="table-yellow">
                                 <th scope="col">Name</th>
-                                <th scope="col" style="width: 20rem">Description</th>
                                 <th scope="col">Price</th>
                                 <th scope="col">Stock</th>
                             </tr>

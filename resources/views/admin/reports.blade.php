@@ -28,51 +28,7 @@
 
                 <div class="row">
                     <div class="container">
-                        <div class="row" style="text-align: center">
-                            <div class="col">
-                                <fieldset class="form-group">
-                                    <legend class="mt-4">Date Range</legend>
-                                    <div class="form-check">
-
-                                        <div class="form-check form-check-inline">
-                                            <label class="form-check-label">
-                                                <input type="radio" class="form-check-input" name="ReportsRadio"
-                                                    id="DailyRadio" value="DailyRadio" checked>
-                                                Daily
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check form-check-inline">
-                                            <label class="form-check-label">
-                                                <input type="radio" class="form-check-input" name="ReportsRadio"
-                                                    id="MonthlyRadio" value="MonthlyRadio">
-                                                Monthly
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check form-check-inline">
-                                            <label class="form-check-label">
-                                                <input type="radio" class="form-check-input" name="ReportsRadio"
-                                                    id="AnnualRadio" value="AnnualRadio">
-                                                Annual
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check form-check-inline">
-                                            <label class="form-check-label">
-                                                <input type="radio" class="form-check-input" name="ReportsRadio"
-                                                    id="CustomRadio" value="CustomRadio">
-                                                Custom
-                                            </label>
-                                        </div>
-
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-
-
-                        <hr>
+ 
                         <div class="row" style="text-align: center" id="customDateDiv">
                             <h5 class="yellow">Custom Date</h5>
                             <div class="col">
@@ -131,17 +87,41 @@
 
                                     <hr>
 
-                                    @foreach ($categories as $category)
-                                        <div class="form-check">
-                                            <input class="form-check-input {{ $category->CategoryID }}" type="checkbox"
-                                                value="{{ $category->CategoryID }}" id="{{ $category->CategoryID }}"
-                                                name="Category">
-                                            <label class="form-check-label" for="flexCheckDefault">
-                                                {{ $category->CategoryName }}
-                                            </label>
-                                        </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
+                                            id="allCheck" name="Category">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            Consumable
+                                        </label>
+                                    </div>
 
-                                    @endforeach
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
+                                            id="allCheck" name="Category">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            Non-Consumable
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
+                                            id="allCheck" name="Category">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            E-Load Regular
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
+                                            id="allCheck" name="Category">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            E-Load Promo
+                                        </label>
+                                    </div>
+
+                                    
+
+                                
                                     </fieldset>
 
 
@@ -176,7 +156,7 @@
 
             </div>
             <div class="card-footer" style="text-align: right">
-            <a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>
+            <a class="btn btn-yellow"><b>Generate</b></a>
             </div>
         </div>
 
@@ -190,28 +170,6 @@
 
     <script>
         $(document).ready(function() {
-
-            //Hide Custom Date Div by Default
-            document.getElementById("customDateDiv").hidden = true;
-            var customRadio = document.getElementById("CustomRadio");
-            var checkedRadio = "DailyRadio";
-
-            //Radio for Reports Time Filter
-            $('input[type=radio][name=ReportsRadio]').change(function() {
-                if (this.value == 'CustomRadio') {
-                    document.getElementById("customDateDiv").hidden = false;
-                    checkedRadio = this.value;
-                } else if (this.value == 'MonthlyRadio') {
-                    document.getElementById("customDateDiv").hidden = true;
-                    checkedRadio = this.value;
-                } else if (this.value == 'AnnualRadio') {
-                    document.getElementById("customDateDiv").hidden = true;
-                    checkedRadio = this.value;
-                } else if (this.value == 'DailyRadio') {
-                    document.getElementById("customDateDiv").hidden = true;
-                    checkedRadio = this.value;
-                }
-            });
 
             //Check box for Category
             $('input[type=checkbox][name=Category]').change(function() {
@@ -229,6 +187,9 @@
             //Generate Report Button on Click
             $('#GenerateButton').click(function(e) {
                 e.preventDefault();
+                var x = document.getElementById("startDate").value;
+
+                alert(x);
 
                 if (checkedRadio == 'CustomRadio') {
                     alert('assign date values from selectors');
@@ -249,7 +210,7 @@
                         data: data,
                         dataType: "json",
                         success: function(response) {
-                            window.location.href = '/test';
+                            window.location.href = '../reportPreview';
                         }
                     });
                 }

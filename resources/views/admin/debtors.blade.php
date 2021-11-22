@@ -4,11 +4,11 @@
     @if ($message = Session::get('deleteTransaction'))
         <?php
         echo "<script>
-            Swal.fire(
-                'Deleted.',
-                'The sales record has been deleted.',
-                'danger'
-            )   </script> ";
+                    Swal.fire(
+                        'Deleted.',
+                        'The sales record has been deleted.',
+                        'danger'
+                    )   </script> ";
         ?>
     @endif
 @endsection
@@ -42,7 +42,8 @@
                         <tr style="text-align: center;">
                             <th scope="col">Debtor IDs</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Contact Number</th>
+                            <th scope="col">Balance</th>
+                            <th scope="col">Initial Payment</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -53,14 +54,12 @@
 
                                 <th scope="row">{{ $debtor->SalesID }}</th>
                                 <td>{{ $debtor->Debtor }}</td>
-                                <td>{{ $debtor->Balance }}</td>
+                                <td>{{ number_format((float)$debtor->Balance, 2, '.', '') }}</td>
+                                <td>{{ number_format((float)$debtor->InitialPayment, 2, '.', '') }}</td>
                                 <td>
-                                    <button class="btn btn-primary debt_record"><i
+                                    <button class="btn btn-primary debt_record" value="{{ $debtor->SalesID }}"><i
                                             class="fas fa-eye"></i></button>
                                     <a class="btn btn-primary" href=""><i class="fas fa-pen"></i></a>
-                                    <button class="btn btn-secondary delete_transaction" value="" type="button"
-                                        data-bs-toggle="modal" data-bs-target="#deleteModal"><i
-                                            class="fas fa-archive"></i></button>
                                 </td>
                             </tr>
                         @endforeach
@@ -76,7 +75,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header blue-bg yellow">
-                    <h5 class="modal-title" id="DebtRecordModalHeader"></h5>
+                    <h5 class="modal-title" id="DebtRecordModalHeader">Mark this debt record as paid?</h5>
                     <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"></span>
                     </button>
@@ -96,6 +95,7 @@
                                 <input type="number" class="form-control deleteCategoryName" id="AmountDue" readonly>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -132,16 +132,10 @@
                         if (response.status == 200) {
 
                             $.each(response.debtor, function(key, dRecord) {
-                                // key would be the numerical index; value is the key:value pair of the array index's element.
-                                console.log(dRecord
-                                .AmountPaid); // should print the firstname of the first element.
-
-                                $('#LastAmountPaid').val(dRecord.AmountPaid);
-                                $('#AmountDue').val(dRecord.AmountDue - dRecord
-                                    .AmountPaid);
+                                $('#AmountPaid').val(dRecord.InitialPayment);
                             });
                         } else {
-                            $('#DebtorsDebt').hide();
+
                         }
                     }
                 });

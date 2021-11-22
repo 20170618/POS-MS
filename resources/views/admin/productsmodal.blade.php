@@ -17,40 +17,29 @@
                     <small id="productHelp" class="form-text text-muted">Must contain product unit in name.</small>
                 </div>
 
-
                 <div class="form-group">
-                    <label class="form-label mt-4">Product Stock</label>
-                    <div class="input-group mb-3">
-                        <input type="number" class="form-control" placeholder="0" name="prodStock" id="prodStock" min="0"> 
+                    <label for="prodCategory" class="form-label mt-3">Product Category</label>
+                    <select class="form-select" id="prodCategory">
+                        <option>Consumable</option>
+                        <option>Non-Consumable</option>
+                        <option>E-Load Regular</option>
+                        <option>E-Load Promo</option>
+                    </select>
                     </div>
-                </div>
 
                 <div class="form-group">
-                    <label>Product Price</label>
+                    <label class="form-label mt-4">Product Price</label>
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" placeholder="0.00" name="prodPrice" id="prodPrice" min="1.00"> 
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Product Category</label>
+                    <label>Product Stock</label>
                     <div class="input-group mb-3">
-                        <select class="form-select" id="prodCategory">
-                            @foreach ($categories as $category)
-                            <option value="{{$category->CategoryID}}">{{$category->CategoryName}}</option>
-                            @endforeach
-                            
-                          </select>
+                        <input type="number" class="form-control" placeholder="0" name="prodStock" id="prodStock" min="0"> 
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Product Description</label>
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" placeholder="Enter the Product's Description" name="prodDescription" id="prodDescription" rows="3"></textarea> 
-                    </div>
-                </div>
-
             </div> 
           
             <div class="modal-footer" style="text-align: right">
@@ -89,7 +78,6 @@
                             <thead style="text-align: center">
                             <tr class="table-yellow">
                                 <th scope="col">Name</th>
-                                <th scope="col" style="width: 20rem">Description</th>
                                 <th scope="col">Price</th>
                                 <th scope="col">Stock</th>
                                 <th scope="col">Actions</th>
@@ -126,17 +114,32 @@
                 <p>
                     You're about to delete this product:
                 </p>
-
-                <label for="delete_productName" class="col-sm-2 col-form-label">Product</label>
-                <input type="text" name="delete_productName" id="delete_productName" value="" disabled>
+                <div class="form-group">
+                    <label for="delete_productName" class="col-sm-2 col-form-label">Product</label>
+                    <input type="text" name="delete_productName" id="delete_productName" value="" disabled>
+                </div>
                 <br>
-                <label for="delete_price" class="col-sm-2 col-form-label">Price</label>
-                <input type="number" name="delete_price" id="delete_price" value="" disabled>
+                <div class="form-group">
+                    <label for="delete_price" class="col-sm-2 col-form-label">Price</label>
+                    <input type="number" name="delete_price" id="delete_price" value="" disabled>
+                </div>
+                
+                
+                <small>Stock must be 0 for product to be deleted.</small>
+                
+                <br>
 
+                <div class="form-group">
+                    <label for="delete_price" class="col-sm-2 col-form-label">Stock</label>
+                    <input type="number" name="delete_stock" id="delete_stock" value="" disabled>
+                 </div>
+                
+                
             </div> 
+            
           
             <div class="modal-footer" style="text-align: right">
-                <button class="btn btn-yellow delete_product_btn" type="button">Delete</button>
+                <button class="btn btn-yellow delete_product_btn" type="button" id="delete_product_btn">Delete</button>
                 <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
             </div>
 
@@ -172,32 +175,27 @@
                 </div>
 
                 <div class="form-group">
-                <label class="form-label mt-4">Product Stock</label>
-                <div class="input-group mb-3">
-                <input type="number" class="form-control" placeholder="Enter Stock" id="edit_stock" min="1">
-                </div>
-                </div>
-        
-                <div class="form-group">
-                <label>Product Price</label>
-                <div class="input-group mb-3">
-                <input type="number" class="form-control" placeholder="Enter Price" id="edit_price" min="1">
-                </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Product Category</label>
+                    <label class="form-label mt-4">Product Category</label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="Enter Product Name" id="edit_category" readonly>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Product Description</label>
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" placeholder="Enter the Product's Description" id="edit_desc" rows="3"></textarea> 
-                    </div>
+                <label class="form-label mt-4">Product Price</label>
+                <div class="input-group mb-3">
+                <input type="number" class="form-control" placeholder="0.00" id="edit_price" min="1">
                 </div>
+
+                <div class="form-group">
+                <label class="form-label">Product Stock</label>
+                <div class="input-group mb-3">
+                <input type="number" class="form-control" placeholder="0" id="edit_stock" min="1">
+                </div>
+                </div>
+        
+                
+            </div>
 
             </div> 
           
