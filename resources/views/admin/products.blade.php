@@ -9,57 +9,18 @@
 
     <div class="container" style="margin-top: 10px">
         <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
-
-        <div class="row" style="margin-top: 10px">
-
-
-            <div class="col-6">
-
-                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                    <button class="btn btn-blue view_product" style="align-items: center" value="Consumable" id="view_product">
-                    <div class="card-body" style="text-align: center">
-                        <h6 style="text-align: center"><b>Consumable</b></h6>
-                    </div>
-                </button>
-                </div>
-
-            </div>
-
-            <div class="col-6">
-
-                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                    <button class="btn btn-blue view_product" style="align-items: center" value="Non-Consumable" id="view_product">
-                    <div class="card-body" style="text-align: center">
-                        <h6 style="text-align: center"><b>Non-Consumable</b></h6>
-                    </div>
-                </button>
-                </div>
-
-            </div>
-
-            <div class="col-6">
-
-                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                    <button class="btn btn-blue view_product" style="align-items: center" value="E-Load Regular" id="view_product">
-                    <div class="card-body" style="text-align: center">
-                        <h6 style="text-align: center"><b>E-Load Regular</b></h6>
-                    </div>
-                </button>
-                </div>
-
-            </div>
-
-            <div class="col-6">
-
-                <div class="card mb-3" style="max-width: 20rem;background-color: transparent">
-                    <button class="btn btn-blue view_product" style="align-items: center" value="E-Load Promo" id="view_product">
-                    <div class="card-body" style="text-align: center">
-                        <h6 style="text-align: center"><b>E-Load Promo</b></h6>
-                    </div>
-                </button>
-                </div>
-
-            </div>
+        <br>
+        <div class="d-inline-block mt-3">
+            <button type="button" class="btn btn-blue btn-lg view_product" value="Consumable" id="view_product">Consumable</button>
+        </div>
+        <div class="d-inline-block">
+            <button type="button" class="btn btn-blue btn-lg view_product" value="Non-consumable" id="view_product">Non-Consumable</button>
+        </div>
+        <div class="d-inline-block">
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Regular" id="view_product">E-load Regular</button>
+        </div>
+        <div class="d-inline-block">
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Promo" id="view_product">E-load Promo</button>
         </div>
 
         <hr>
@@ -148,7 +109,7 @@
                     if(response.status=200){
                         console.log(response.products);
                         var len = response.products.length;
-                        
+
                         $("#productsTable tbody").empty();
                         for (var i = 0; i < len; i++) {
                             var id = response.products[i].ProductID;

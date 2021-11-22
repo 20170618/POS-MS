@@ -346,7 +346,7 @@ class HomeController extends Controller
                 ]);
             }
 
-            
+
         }
     }
 
@@ -378,10 +378,10 @@ class HomeController extends Controller
 
         return view('admin.editTransaction', compact('details','sales'));
     }
-    
+
     public function viewSamePricedProducts($price){
         $sameProds = DB::table('product')->where('Price','=', $price)->get();
-        
+
         return response()->json([
             'status'=>200,
             'products'=>$sameProds,
@@ -431,7 +431,7 @@ class HomeController extends Controller
             ->select()
             ->where('Stock','=','0')
             ->whereBetween('updated_at', [$newStartDate, $newEndDate]);
-            
+
 
          $pdf = PDF::loadview('exportToPDF', compact('data'));
 
@@ -446,7 +446,7 @@ class HomeController extends Controller
 
             $newStartDate = date('Y-m-d', strtotime($startDate));
             $newEndDate = date('Y-m-d', strtotime($endDate));
-            
+
             $pdf = App::make('dompdf.wrapper');
             $pdf->loadHTML($this->convert_order_data_to_html($newStartDate, $newEndDate));
             $pdf->setPaper('A4', 'landscape');
@@ -454,7 +454,7 @@ class HomeController extends Controller
     }
 
     function convert_order_data_to_html($sD, $eD)
-    {       
+    {
         $now = Carbon::now();
         $data = DB::table('product')
             ->select()
@@ -495,7 +495,7 @@ class HomeController extends Controller
             width: 100%;
         }
 
-    
+
             </style>
         </head>
         <body>
@@ -547,7 +547,7 @@ class HomeController extends Controller
             </tr>
             ';
         }
-       
+
         $output .='
         </tbody>
     </table>
@@ -735,12 +735,14 @@ class HomeController extends Controller
                 $data = DB::table('sales')
                     ->join('users','sales.PersonInCharge','=','users.UserID')
                     ->join('credits','sales.SalesID','=','credits.SalesID')
-                    ->select('users.FirstName as FirstName','sales.*','credits.BalancePayDate','users.*','sales.created_at as created_at')
-                    ->whereRaw("(credits.BalancePayDate IS NOT NULL AND (SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
+                    ->select('users.FirstName as FirstName','sales.*','BalancePayDate','users.*','sales.created_at as created_at')
+                    ->whereRaw("(BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
                     ->orderBy('sales.SalesID', 'desc')
                     ->get();
             }else{
-                $data = DB::table('sales')->join('users','sales.PersonInCharge','=','users.UserID')->where('ModeOfPayment','=','Cash')->get();
+                $data = DB::table('sales')->join('users','sales.PersonInCharge','=','users.UserID')
+                ->join('credits','sales.SalesID','=','credits.SalesID')
+                ->whereRaw("BalancePayDate IS NOT NULL")->get();
             }
 
             $total_row = $data->count();

@@ -21,11 +21,8 @@
 
     <div class="container" style="margin-top: 10px">
         <div class="row">
-            <div class="col-2">
+            <div class="col-8">
                 <button class="btn btn-yellow" type="button" onclick="document.location='{{ route('admin.addtransaction') }}'">Add Transaction</button>
-            </div>
-            <div class="col-6">
-                <button class="btn btn-yellow" type="button">View Debts</button>
             </div>
             <div class="col">
                 <div class="form-group">
