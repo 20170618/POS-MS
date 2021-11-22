@@ -11,6 +11,7 @@ use App\Models\SalesDetails;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App;
 use Redirect,Response;
 use Illuminate\Support\Facades\Log;
 use PDF;
@@ -156,7 +157,7 @@ class HomeController extends Controller
     {
         $debtors = DB::table('credits')
              ->select()
-             ->orderBy('BalancePayDate')
+             ->whereNull('BalancePayDate')
              ->get();
         return view('admin.addtransaction', compact('debtors'));
     }
@@ -367,7 +368,7 @@ class HomeController extends Controller
     public function editTransaction($id){
         $details = DB::table('SalesDetails')
             ->join('product','SalesDetails.ProductID','=','product.ProductID')
-            ->select('SalesDetails.*', 'product.ProductName as ProductName', 'product.Price as ProductPrice')
+            ->select('SalesDetails.*', 'product.ProductName as ProductName', 'product.Price as ProductPrice', DB::raw('product.Price*SalesDetails.Quantity as AmountDue'))
             ->where('SalesID', '=', $id)
             ->get();
         $sales = DB::table('sales')
@@ -376,7 +377,15 @@ class HomeController extends Controller
             ->get();
 
         return view('admin.editTransaction', compact('details','sales'));
-
+    }
+    
+    public function viewSamePricedProducts($price){
+        $sameProds = DB::table('product')->where('Price','=', $price)->get();
+        
+        return response()->json([
+            'status'=>200,
+            'products'=>$sameProds,
+        ]);
     }
 
     public function search(){
@@ -412,37 +421,139 @@ class HomeController extends Controller
 
     public function adminGenerateReport(Request $request){
         $now = Carbon::now();
-        $check = $request->input('checkedRadio');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
 
-        if($check =='MonthlyRadio'){
-            $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
-            $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
+        $newStartDate = date('Y-m-d', strtotime($startDate));
+        $newEndDate = date('Y-m-d', strtotime($endDate));
 
-            $transactions=DB::table('sales')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->get();
-        }else if($check=='AnnualRadio'){
-            $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
-            $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
+        $data = DB::table('product')
+            ->select()
+            ->where('Stock','=','0')
+            ->whereBetween('updated_at', [$newStartDate, $newEndDate]);
+            
 
-            $transactions=DB::table('sales')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->get();
-        }else if($check=='DailyRadio'){
-            $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
-            $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
-
-            $transactions=DB::table('sales')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->get();
-        }
-
-
-        $data="sample";
-         $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
+         $pdf = PDF::loadview('exportToPDF', compact('data'));
 
 
         return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
+    }
+
+    public function adminGenerateReport2(Request $request){
+            $now = Carbon::now();
+            $startDate = $request->input('startDate');
+            $endDate = $request->input('endDate');
+
+            $newStartDate = date('Y-m-d', strtotime($startDate));
+            $newEndDate = date('Y-m-d', strtotime($endDate));
+            
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->loadHTML($this->convert_order_data_to_html($newStartDate, $newEndDate));
+            $pdf->setPaper('A4', 'landscape');
+            return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
+    }
+
+    function convert_order_data_to_html($sD, $eD)
+    {       
+        $now = Carbon::now();
+        $data = DB::table('product')
+            ->select()
+            ->where('Stock','=','0')
+            ->whereBetween('updated_at', [$sD, $eD])
+            ->get();
+
+        $data2 = DB::table('sales')
+            ->join('users','sales.PersonInCharge','=','users.UserID')
+            ->select('sales.*','users.FirstName as fName','users.LastName as lName')
+            ->get();
+        $title = "Migui's Store Report";
+        $output = '
+        <head>
+            <style>
+            .page-break {
+                page-break-after: always;
+            }
+
+        body {
+            font-family: "Trebuchet MS", sans-serif;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #343a41;;
+            color: white;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+    
+            </style>
+        </head>
+        <body>
+        <div class="row">
+            <h2 style="text-align: center;margin-top: 50%">'.$title.'</h2>
+            <h3 style="text-align: center">Date Created: '.$now.'</h3>
+            <h3 style="text-align: center">Start Date: '.$sD.' End Date: '.$eD.'</h3>
+        </div>
+            <div class="page-break"></div>
+            <h3>Products Out of Stock</h3>
+                <table class="table table-light">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        ';
+        foreach ($data as $da) {
+            $output .= '
+            <tr>
+                <td>'.$da->ProductName.'</td>
+                <td>'.$da->Category.'</td>
+                <td>'.$da->Stock.'</td>
+            </tr>
+            ';
+        }
+        $output .= '</tbody>
+    </table>
+    <div class="page-break"></div>
+    <h3>All Transactions</h3>
+                <table class="table table-light">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>SalesID</th>
+                            <th>PersonInCharge</th>
+                            <th>Mode Of Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+        foreach ($data2 as $da2) {
+            $output .= '
+            <tr>
+                <td>'.$da2->SalesID.'</td>
+                <td>'.$da2->fName.' '.$da2->lName.'</td>
+                <td>'.$da2->ModeOfPayment.'</td>
+            </tr>
+            ';
+        }
+       
+        $output .='
+        </tbody>
+    </table>
+        </body>
+        </html>';
+        return $output;
     }
 
 
@@ -623,8 +734,9 @@ class HomeController extends Controller
             if($query != ''){
                 $data = DB::table('sales')
                     ->join('users','sales.PersonInCharge','=','users.UserID')
-                    ->select('users.FirstName as FirstName','sales.*', 'users.*', 'sales.created_at as created_at')
-                    ->whereRaw("((ModeOfPayment = 'Cash') AND (SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
+                    ->join('credits','sales.SalesID','=','credits.SalesID')
+                    ->select('users.FirstName as FirstName','sales.*','credits.BalancePayDate','users.*','sales.created_at as created_at')
+                    ->whereRaw("(credits.BalancePayDate IS NOT NULL AND (SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
                     ->orderBy('sales.SalesID', 'desc')
                     ->get();
             }else{
@@ -670,6 +782,7 @@ class HomeController extends Controller
     {
         $debtors = DB::table('credits')
             ->select()
+            ->whereNull('BalancePayDate')
             ->get();
         return view('admin.debtors', compact('debtors'));
     }
@@ -691,6 +804,27 @@ class HomeController extends Controller
             ]);
         }
 
+    }
+
+    public function debtorsClearRecord($id){
+        $currentDate = Carbon::now();
+
+        DB::table('credits')
+        ->where("SalesID", '=',  $id)
+        ->update(['credits.BalancePayDate'=> $currentDate]);
+
+        return response()->json([
+            'status'=>100,
+            'message'=>'Debt record has been successfully cleared!'
+        ]);
+        // $product->ProductName = $request->input('ProductName');
+        // $product->Price = $request->input('Price');
+        // $product->Stock = $request->input('Stock');
+        // $product->update();
+        // return response()->json([
+        //     'status'=>200,
+        //     'message'=>'Product Updated Successfully',
+        // ]);
     }
 
     public function adminUserManagement()

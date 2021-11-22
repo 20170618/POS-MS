@@ -57,9 +57,9 @@
                                 <td>{{ number_format((float)$debtor->Balance, 2, '.', '') }}</td>
                                 <td>{{ number_format((float)$debtor->InitialPayment, 2, '.', '') }}</td>
                                 <td>
-                                    <button class="btn btn-primary debt_record" value="{{ $debtor->SalesID }}"><i
-                                            class="fas fa-eye"></i></button>
-                                    <a class="btn btn-primary" href=""><i class="fas fa-pen"></i></a>
+                                    <button class="btn btn-success debt_record" value="{{ $debtor->SalesID }}"><i
+                                            class="fas fa-check"></i></button>
+                                    <a class="btn btn-primary" href=""><i class="fas fa-eye"></i></a>
                                 </td>
                             </tr>
                         @endforeach
@@ -84,6 +84,12 @@
                     <div id="DebtorsDebt">
                         <input type="hidden" id="delete_tran_id">
                         <div class="form-group">
+                            <label for="Debtor Name" class="form-label mt-2">Debtor Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control DebtorName" id="DebtorName" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="Amount Due" class="form-label mt-2">Last Amount Paid:</label>
                             <div class="input-group">
                                 <input type="number" class="form-control LastAmountPaid" id="LastAmountPaid" readonly>
@@ -100,7 +106,8 @@
                 </div>
 
                 <div class="modal-footer" style="text-align: right">
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Okay</button>
+                <button class="btn btn-warning clear_debt" type="button" data-bs-dismiss="modal" id="CurrentDebt">Yes</button>
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
 
             </div>
@@ -111,6 +118,7 @@
     <script>
         $(document).ready(function() {
 
+            //Click Check Button
             $(document).on('click', '.debt_record', function() {
 
                 $('#DebtRecordModal').modal('show');
@@ -132,7 +140,10 @@
                         if (response.status == 200) {
 
                             $.each(response.debtor, function(key, dRecord) {
-                                $('#AmountPaid').val(dRecord.InitialPayment);
+                                $('#DebtorName').val(dRecord.Debtor);
+                                $('#LastAmountPaid').val(dRecord.InitialPayment);
+                                $('#AmountDue').val(dRecord.Balance);
+                                $('#CurrentDebt').val(dRecord.SalesID);
                             });
                         } else {
 
@@ -141,6 +152,39 @@
                 });
 
             });
+
+
+            // Yes to clear the debt record
+            $('.clear_debt').click(function (e) { 
+                e.preventDefault();
+                
+                var debtid = $('#CurrentDebt').val();
+
+                $.ajax({
+                    type: "GET",
+                    url: "debtors-clear/"+debtid,
+                    success: function (response) {
+                        
+                        if(response.status==100){
+                            Swal.fire(
+                                'Success!',
+                                response.message,
+                                'success'
+                                )
+                            location.reload();
+                        }
+
+                    }
+                });
+
+            });
+
+            // View the specific debt's transaction details
+            $('.view_details').click(function (e) { 
+                e.preventDefault();
+                
+            });
+
 
         });
         // End Delete

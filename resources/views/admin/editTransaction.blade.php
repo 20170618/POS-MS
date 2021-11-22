@@ -23,7 +23,53 @@
     </div>
 
     
-    
+    <div class="container" style="margin-top: 10px; width: 50%;">
+        <div class="row">
+            <div class="card text-white mb-3 blue-bg">
+                <div class="card-body yellow">
+                    <div class="row">
+                        <div class="col-4">
+                            <h3 class="yellow">Replace/Exchange Form</h3>
+                        </div>
+                        <br>
+                    </div>
+                    <div class="row">
+                        <div class = "col-md-2">
+                            <label for="SaleId" class="col col-form-label">Sales ID</label>
+                            
+                        </div>
+                        <div class="col-md-5">
+                            @foreach ($sales as $sale)
+                            <input id = "SaleId" class="form-control" readonly value="{{ $sale->SalesID }}">
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-md-2">
+                            <label for="productToReplace" class="col col-form-label">Product To Replace</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select onchange="newProduct(this)" width="100%;">
+                                @foreach ($details as $detail)
+                                    <option id = "product{{$detail->ProductName}}" value="{{$detail->ProductPrice}}">{{$detail->ProductName}} </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-md-2">
+                            <label for="newProduct" class="col col-form-label">New Product</label>
+                        </div>
+                        <div class="col-md-5">
+                            @foreach ($sales as $sale)
+                            <input id = "SaleId" class="form-control" readonly value="{{ $sale->SalesID }}">
+                            @endforeach
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
     <div class="container" style="margin-top: 10px">
@@ -94,30 +140,13 @@
                                         <div class="form-group row">
                                             <label for="total" class="col-sm-7 col-form-label">Total</label>
                                             <div class="col-sm-5">
-                                                @foreach ($sales as $sale)
-                                                <input id = "total" class="form-control" placeholder="0.00" readonly value="{{number_format($sale->AmountDue, 2)}}"> 
+                                                @foreach ($details as $detail)
+                                                <input id = "total" class="form-control" placeholder="0.00" readonly value="{{number_format($detail->AmountDue, 2)}}"> 
                                                 @endforeach
                                             </div>
                                         </div>
 
-                                        <div class="form-group row">
-                                            <label for="cash" class="col-sm-7 col-form-label">Cash</label>
-                                            <div class="col-sm-5">
-                                                @foreach ($sales as $sale)
-                                                <input name="cash" id = "cash" type="number" min="0" class="form-control" placeholder="0.00" readonly value="{{number_format($sale->AmountPaid, 2)}}"> 
-                                                @endforeach
-                                                
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label for="change" class="col-sm-7 col-form-label">Change</label>
-                                            <div class="col-sm-5">
-                                                @foreach ($sales as $sale)
-                                                <input id = "change" class="form-control" placeholder="0.00" readonly value="{{number_format($sale->AmountPaid - $sale->AmountDue, 2)}}">
-                                                @endforeach
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
 
@@ -136,6 +165,26 @@
     </div>
 
     <script>
+
+        function newProduct(selectedOpt){
+            var a = selectedOpt.value;
+            console.log(a);
+
+            $.ajax({
+                type: "GET",
+                header: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                url: "samePricedProducts/" + a,
+                dataType: "json",
+                success: function (response) {
+                    if(response.status == 400){
+                        console.log("works")
+                        //console.log(response.products);
+                    }
+                }
+            });
+        }
         //format should be year/month/date 
         var dt = new Date().toLocaleString();
         var initialPrice=[];

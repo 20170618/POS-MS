@@ -120,20 +120,23 @@
                         <table style="table table-bordered mb-5">
                             <thead>
                                 <tr>
+                                    <th scope="col">Product name</th>
                                     <th scope="col">Category</th>
-                                    <th scope="col">Amount Sold</th>
-                                    <th scope="col">Sales</th>
-                                    <th scope="col">% to total</th>
+                                    <th scope="col">Stock remaining</th>
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @foreach ($data as $d)
                                 <tr>
-                                    <td>sample</td>
-                                    <td>sample</td>
-                                    <td>sample</td>
-                                    <td>sample</td>
+                                    <td>{{$d->ProductName}}</td>
+                                    <td>{{$d->Category}}</td>
+                                    <td>{{$d->Stock}}</td>
+                                  
                                 </tr>
+                                    
+                                @endforeach
+
+                                
 
                             </tbody>
 

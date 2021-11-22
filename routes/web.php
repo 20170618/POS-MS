@@ -50,9 +50,7 @@ Route::get('/reportPreview', function () {
     return view('reportPreview');
      });
 
-     Route::get('/exportToPDF', function () {
-        return view('exportToPDF');
-         });
+     Route::get('/exportToPDF',[HomeController::class,'adminGenerateReport']);
 
 
 
@@ -92,6 +90,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::get('transactionDetails/{id}', [HomeController::class, 'transactionDetails'])->name('admin.transactionDetails');
     Route::get('transactions/edit/{id}', [HomeController::class, 'editTransaction'])->name('admin.editTransaction');
     Route::put('transactions/update/{id}', [HomeController::class, 'updateTransaction'])->name('admin.updateTransaction');
+    Route::get('samePricedProducts/{a}', [HomeController::class, 'viewSamePricedProducts']);
 
     Route::get('eload', [HomeController::class, 'adminEload'])->name('admin.eload');
 
@@ -102,6 +101,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
 
     Route::get('debtors', [HomeController::class, 'adminDebtors'])->name('admin.debtors');
     Route::get('debtors-record/{id}',[HomeController::class, 'debtorsRecordView']);
+    Route::get('debtors-clear/{id}',[HomeController::class, 'debtorsClearRecord']);
 
     Route::get('userManagement', [HomeController::class, 'adminUserManagement'])->name('admin.userManagement');
     Route::get('userManagement/archive-user/{id}', [UserController::class, 'archive']);
@@ -109,6 +109,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
 
     Route::get('reports', [HomeController::class, 'adminReports'])->name('admin.reports');
     Route::get('reports/generate',[HomeController::class, 'adminGenerateReport']);
+    Route::get('/reports/generate2',[HomeController::class, 'adminGenerateReport2']);
    
     // Route::get('/admin/PDF',[HomeController::class,'createPDF']);
 

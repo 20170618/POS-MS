@@ -20,9 +20,7 @@
                             <div class="col-3">
                                 <button class="btn btn-yellow" style="width: 10rem" type="button" data-bs-toggle="modal" data-bs-target="#accessLogsModal">Access Logs</button>
                             </div>
-                            <div class="col-2">
-                                <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#pendingModal">Pending</button>
-                            </div>
+                    
                         </div>
         
                         &nbsp;

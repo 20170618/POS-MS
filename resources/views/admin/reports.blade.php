@@ -40,7 +40,7 @@
                                             <div class="input-group mb-3">
                                                 <input type="date" class="form-control" placeholder="Date"
                                                     aria-label="Recipient's username" aria-describedby="button-addon2"
-                                                    id="startDate">
+                                                    id="startDate" required>
                                                 <!--<button class="btn btn-yellow" type="button" id="button-addon2"><i class="fas fa-calendar-alt fa-lg"></i></button>-->
                                             </div>
                                         </div>
@@ -56,7 +56,7 @@
                                             <div class="input-group mb-3">
                                                 <input type="date" class="form-control" placeholder="Date"
                                                     aria-label="Recipient's username" aria-describedby="button-addon2"
-                                                    id="endDate">
+                                                    id="endDate" required>
                                                 {{-- <button class="btn btn-yellow" type="button" id="button-addon2"><i class="fas fa-calendar-alt fa-lg"></i></button> --}}
                                             </div>
                                         </div>
@@ -150,14 +150,16 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>  
 
 
 
             </div>
             <div class="card-footer" style="text-align: right">
-            <a class="btn btn-yellow"><b>Generate</b></a>
+            <a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>
             </div>
+
+            <button class="btn" id="GenerateButton">Generate 2</button>
         </div>
 
 
@@ -187,33 +189,34 @@
             //Generate Report Button on Click
             $('#GenerateButton').click(function(e) {
                 e.preventDefault();
-                var x = document.getElementById("startDate").value;
+                var startDate = document.getElementById("startDate").value;
+                var endDate = document.getElementById("endDate").value;
 
-                alert(x);
+                console.log(startDate+" "+endDate);
 
-                if (checkedRadio == 'CustomRadio') {
-                    alert('assign date values from selectors');
-                } else {
-                    console.log(checkedRadio);
-
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    var data = {
-                        'checkedRadio': checkedRadio
+               $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
-                    $.ajax({
-                        type: "GET",
-                        url: "reports/generate",
-                        data: data,
-                        dataType: "json",
-                        success: function(response) {
-                            window.location.href = '../reportPreview';
-                        }
-                    });
+                });
+
+                var data = {
+                    'startDate': startDate,
+                    'endDate': endDate
                 }
+                console.log(data);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/admin/reports/generate2",
+                    data: data,
+                    dataType: "json",
+                    success: function(response) {
+                        window.location.href = "/admin/reports/generate2";
+                    }
+                    
+                });
+                window.location.href = "/admin/reports/generate2";
             });
 
             //Time limiter for End Date Input
