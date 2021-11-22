@@ -17,14 +17,11 @@
                             <div class="col-7">
                                 <h4 class="yellow">Active Users</h4>
                             </div>
-                            <div class="col-3">
-                                <button class="btn btn-yellow" style="width: 10rem" type="button" data-bs-toggle="modal" data-bs-target="#accessLogsModal">Access Logs</button>
-                            </div>
-                    
+
                         </div>
-        
+
                         &nbsp;
-        
+
                         <div class="row">
                             <div class="container">
                                 <table class="table table-hover">
@@ -36,8 +33,8 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                
-                                    @foreach ($actives as $active)  
+
+                                    @foreach ($actives as $active)
                                         <tr class="table-light">
                                             <th scope="row">{{$active->FirstName}} {{$active->LastName}}</th>
                                             <td>{{$active->UserType}}</td>
@@ -46,7 +43,7 @@
                                                 @if (Auth::user()->UserID != $active->UserID)
                                                 <button class="btn btn-danger archive_user" value={{$active->UserID}} type="button"><i class="fas fa-archive"></i></button>
                                                 @endif
-                                                
+
                                             </td>
                                         </tr>
                                     @endforeach
@@ -56,13 +53,13 @@
                                            <div class="d-flex justify-content-center pt-4"> {{ $actives->links() }} </div>
                                         </td>
                                     </tr>
-                                    
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        
-                    </div>            
+
+                    </div>
                 </div>
             </div>
 
@@ -74,9 +71,9 @@
                                 <h4 class="yellow">Archived Users</h4>
                             </div>
                         </div>
-        
+
                         &nbsp;
-        
+
                         <div class="row">
                             <div class="container">
                                 <table class="table table-hover">
@@ -89,7 +86,7 @@
                                     </thead>
                                     <tbody>
 
-                                    @foreach ($restricteds as $restricted)  
+                                    @foreach ($restricteds as $restricted)
                                         <tr class="table-light">
                                             <th scope="row">{{$restricted->FirstName}} {{$restricted->LastName}}</th>
                                             <td>{{$restricted->UserType}}</td>
@@ -102,19 +99,19 @@
                                            <div class="d-flex justify-content-center pt-4"> {{ $restricteds->links() }} </div>
                                         </td>
                                     </tr>
-                                    
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        
-                    </div>            
+
+                    </div>
                 </div>
             </div>
         </div>
-        
 
-        
+
+
 
     </div>
 @extends('admin.usersmodals')

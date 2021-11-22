@@ -448,7 +448,6 @@
                 data: data,
                 dataType: "json",
                 success: function(response) {
-
                     if (response.status == 400) {
                         $('#transactionMessage').html("");
                         $('#transactionMessage').addClass('alert alert-danger');
@@ -459,8 +458,6 @@
                         $('#saveform_errList').html("");
                         //$('#sales_message').addClass('alert alert-info');
                         //$('#sales_message').text(response.message);
-
-
                         Swal.fire(
                             "Success!",
                             "" + response.message + "",

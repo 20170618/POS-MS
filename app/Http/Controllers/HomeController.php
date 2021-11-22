@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesDetails;
 use App\Models\Category;
+use App\Models\ELoad;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App;
@@ -140,7 +141,14 @@ class HomeController extends Controller
             ->select('sales.*', 'users.*', 'sales.created_at as created_at')
             ->orderBy('sales.SalesID', 'desc')
             ->get();
-        return view('admin.eload', compact('sales'));
+        $regular = DB::table('product')
+            ->where('ProductName', 'LIKE', '%Regular%')
+            ->get();
+        $promos = DB::table('product')
+            ->where('ProductName', 'NOT LIKE', '%Regular%')
+            ->where('Category', '=', 'E-Load Promo')
+            ->get();
+        return view('admin.eload', compact('sales', 'regular','promos'));
     }
 
     public function salesPersonEload()
@@ -257,6 +265,39 @@ class HomeController extends Controller
         return response()->json([
             'status'=>200,
             'message'=>'Transaction Deleted Successfully',
+        ]);
+    }
+
+    public function filterPromos(){
+        $promos = DB::table('product')
+            ->where('ProductName', 'NOT LIKE', '%Regular%')
+            ->where('Category', '=', 'E-Load Promo')
+            ->get();
+        return response()->json([
+            'status'=>200,
+            'message'=>'Filtered Successfully',
+            'promos'=>$promos,
+        ]);
+    }
+
+    public function storeEload(Request $request){
+        $eLoad = new ELoad;
+        $eLoad->ProductID = $request->input('ProductID');
+        $eLoad->LoadAmount = $request->input('LoadAmount');
+        $eLoad->save();
+
+        return response()->json([
+            'status'=>200,
+            'message'=>'E-Load transaction successful!',
+        ]);
+    }
+
+    public function getPromoPrice($id){
+        $product = Product::find($id)->get();
+        $price = $product->Price();
+        return response()->json([
+            'status'=>200,
+            'price'=>$product,
         ]);
     }
 
@@ -380,11 +421,12 @@ class HomeController extends Controller
     }
 
     public function viewSamePricedProducts($price){
-        $sameProds = DB::table('product')->where('Price','=', $price)->get();
+        $sameProds = DB::table('product')->select('product.*')->where('Price','=', $price)->get();
 
         return response()->json([
             'status'=>200,
             'products'=>$sameProds,
+            'message'=>"working",
         ]);
     }
 
@@ -742,7 +784,7 @@ class HomeController extends Controller
             }else{
                 $data = DB::table('sales')->join('users','sales.PersonInCharge','=','users.UserID')
                 ->join('credits','sales.SalesID','=','credits.SalesID')
-                ->whereRaw("BalancePayDate IS NOT NULL")->get();
+                ->whereRaw("BalancePayDate", "!=", "NULL")->get();
             }
 
             $total_row = $data->count();
@@ -899,4 +941,3 @@ class HomeController extends Controller
     //     return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
     // }
 }
-

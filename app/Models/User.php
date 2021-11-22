@@ -12,7 +12,7 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'users';
-    protected $primaryKey = 'UserID';    
+    protected $primaryKey = 'UserID';
     /**
      * The attributes that are mass assignable.
      *

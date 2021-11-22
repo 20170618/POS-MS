@@ -15,6 +15,7 @@ class CreateEloadsTable extends Migration
     {
         Schema::create('eloads', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('ProductID');
             $table->double('LoadAmount',8,2);
             $table->timestamps();
         });

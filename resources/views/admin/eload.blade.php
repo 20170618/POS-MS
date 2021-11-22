@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <div id="sales_message"></div>
+
 
     <br>
 
@@ -23,6 +23,8 @@
 
     <!-- Add Regular Modal -->
     <div id="addRegularModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+        <form class="form-horizontal" id = "saveRegular">
+            @csrf
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header blue-bg yellow">
@@ -32,49 +34,49 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="saveform_errList"></div>
+                <div id="load_errList"></div>
                     <div class="form-group">
-                        <label for="exampleSelect2" class="form-label mt-4">Operator</label>
-                        <select multiple="" class="form-select" id="exampleSelect2">
-                          <option>SMART</option>
-                          <option>GLOBE</option>
-                          <option>SUN</option>
-                          <option>TNT</option>
-                          <option>TM</option>
-                        </select>
-                      </div>
 
-                      <div class="row">
-                          <div class="col">
+                        <label for="exampleSelect2" class="form-label mt-4">Operator</label>
+                        <select class="form-select" id="exampleSelect2">
+                            @foreach ($regular as $load)
+                                    <option id = "product{{$load->ProductName}}" value="{{$load->ProductID}}">{{$load->ProductName}} </option>
+                                @endforeach
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
                             <div class="form-group">
-                                <label class="form-label mt-4">Price</label>
+                                <label class="form-label mt-4">Load Amount</label>
                                 <div class="input-group mb-3">
-                                    <input type="number" class="form-control" placeholder="0.00" name="regularPrice" id="regularPrice" min="1.00">
+                                    <input type="number" class="form-control" placeholder="0.00" name="regularPrice" id="regularPrice" min="1.00" required>
                                 </div>
                             </div>
-                          </div>
-                          <div class="col">
+                        </div>
+                        <div class="col">
                             <div class="form-group">
                                 <label class="form-label mt-4">Markup</label>
                                 <div class="input-group mb-3">
                                     <input type="number" class="form-control" placeholder="0.00" name="markUp" id="markUp" min="1.00" readonly>
                                 </div>
                             </div>
-                          </div>
+                        </div>
 
-                      </div>
+                    </div>
 
 
 
                 </div>
 
                 <div class="modal-footer" style="text-align: right">
-                    <button class="btn btn-yellow add_regular" type="button">Add</button>
+                    <button class="btn btn-yellow add_regular" type="submit">Add</button>
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
 
             </div>
         </div>
+    </form>
     </div>
     <!-- End Add Regular Modal -->
 
@@ -90,29 +92,62 @@
                 </div>
                 <div class="modal-body">
                     <div id="saveform_errList"></div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label class="form-label mt-4">Promo Name</label>
-
                             <input type="text" class="form-control" placeholder="Product Name" name="prodName" id="prodName">
+                    </div> --}}
+
+                    <div class="form-group">
+                        <label for="searched" class="form-label mt-4">Promos</label>
+                        <select class="form-select" id="selectedPromo">
+                            @foreach ($promos as $promo)
+                                    <option value="{{$promo->ProductID}}">{{$promo->ProductName}} </option>
+                                @endforeach
+                        </select>
                     </div>
 
 
                     <div class="row">
                         <div class="col">
-                          <div class="form-group">
-                              <label class="form-label mt-4">Price</label>
-                              <div class="input-group mb-3">
-                                  <input type="number" class="form-control" placeholder="0.00" name="regularPrice" id="regularPrice" min="1.00" readonly>
-                              </div>
-                          </div>
+                        <div class="form-group">
+                            <label class="form-label mt-4">Price</label>
+                            <div class="input-group mb-3">
+                                <div style="display: none">
+                                    {{ $count = 0 }}
+                                </div>
+                                @foreach ($promos as $promo)
+                                    <div style="display: none">
+                                        {{ $count += 1 }}
+                                    </div>
+                                    @if ($count == 1)
+                                        <input type="number" value="{{$promo->Price}}" class="form-control" placeholder="0.00" name="promoPrice" id="promoPrice" min="1.00" readonly>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
-                        <div class="col">
-                          <div class="form-group">
-                              <label class="form-label mt-4">Markup</label>
-                              <div class="input-group mb-3">
-                                  <input type="number" class="form-control" placeholder="0.00" name="markUp" id="markUp" min="1.00" readonly>
-                              </div>
-                          </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label mt-4">Markup</label>
+                            <div class="input-group mb-3">
+                                <div style="display: none">
+                                    {{ $count = 0 }}
+                                </div>
+                                @foreach ($promos as $promo)
+                                    <div style="display: none">
+                                        {{ $count += 1 }}
+                                    </div>
+                                    @if ($count == 1)
+                                        @if ( $promo->Price < 500 )
+                                            <input type="number" value="5" class="form-control" placeholder="0.00" name="promoPrice" id="promoPrice" min="1.00" readonly>
+                                        @else
+                                            <input type="number" value="10" class="form-control" placeholder="0.00" name="promoPrice" id="promoPrice" min="1.00" readonly>
+                                        @endif
+                                    @endif
+                                @endforeach
+
+                            </div>
+                        </div>
                         </div>
 
                     </div>
@@ -120,7 +155,7 @@
                 </div>
 
                 <div class="modal-footer" style="text-align: right">
-                    <button class="btn btn-yellow add_product" type="button">Add</button>
+                    <button class="btn btn-yellow add_promo" type="button">Add</button>
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
 
@@ -131,31 +166,165 @@
     <!--End of Promo Modal-->
 
     <script>
-        //format should be year/month/date
-        var dt = new Date().toLocaleString();
-        $(document).ready(function(){
 
-            fetch_data();
-            //fetch all records
-            function fetch_data(query=''){
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": jQuery('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+
+            $('#selectedPromo').on('change', function (e) {
+                price = $('#promoPrice').val();
+                $('#selectedPromo').val()
+                var prodId = $('#selectedPromo').val();
                 $.ajax({
-                    url:"{{ route('admin.search')}}",
-                    method:'GET',
-                    data:{query:query},
-                    dataType:'json',
-                    success:function(data){
-                        $('#productBody').html(data.table_data);
-                        $('#total_records').text(data.total_data);
+                    type: "GET",
+                    url: "getPromoPrice/" + prodId,
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response.product);
+                        if(response.product.Price < 500){
+                            $('#promoMarkUp').val(5);
+                        }else{
+                            $('#promoMarkUp').val(10);
+                        }
                     }
                 });
-            }
-
-            $(document).on('keyup','#search',function(){
-                var query = $(this).val();
-                fetch_data(query);
-                console.log(query);
             });
+
+            $(document).on('keyup','#regularPrice',function(){
+                var amount = $('#regularPrice').val();
+                var prodId = $('#exampleSelect2').val();
+                console.log(prodId);
+                if(amount < 500){
+                    $('#markUp').val(5);
+                }else{
+                    $('#markUp').val(10);
+                }
+            });
+
+            $(document).on('keyup','#prodName',function(){
+                var name = $('#prodName').val();
+                console.log(name);
+                $.ajax({
+                    type: "PUT",
+                    url: "filter",
+                    data: {
+                        'productName': name,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if(response.status == 200){
+                            console.log(response.message);
+                        }else{
+                            console.log('error!');
+                        }
+
+                    }
+                });
+            });
+
+            $('#addRegularModal').on('hidden.bs.modal', function () {
+                $('#load_errList').removeClass('alert alert-danger');
+                $('#exampleSelect2').val("");
+            })
+
+            $(document).on('click', '.add_regular', function(e){
+                e.preventDefault();
+                var amount = $('#regularPrice').val();
+                var prodId = $('#exampleSelect2').val();
+                var mark = $('#promoMarkUp').val();
+                console.log(amount);
+                console.log(prodId);
+                if(amount == "" || prodId == ""){
+                    $('#load_errList').html("");
+                    $('#load_errList').addClass('alert alert-danger');
+                    $('#load_errList').text("Please fill in all fields!");
+                }else{
+
+                    var data = {
+                        'ProductID' : prodId,
+                        'LoadAmount': amount-mark,
+                    };
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.ajax({
+                        type: "PUT",
+                        url: "eload/storeEload",
+                        data: data,
+                        success: function (response) {
+                            if (response.status == 200) {
+                                Swal.fire(
+                                "Success!",
+                                "" + response.message + "",
+                                "success"
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            }else{
+                                $('#load_errList').html("");
+                                $('#load_errList').addClass('alert alert-danger');
+                                $('#load_errList').text("Error! Something went wrong!");
+                            }
+                        }
+                    });
+                }
+            });
+
+            $(document).on('click', '.add_promo', function(e){
+                e.preventDefault();
+                var amount = $('#promoPrice').val();
+                var prodId = $('#selectedPromo').val();
+                console.log(amount);
+                console.log(prodId);
+                if(amount == "" || prodId == ""){
+                    $('#load_errList').html("");
+                    $('#load_errList').addClass('alert alert-danger');
+                    $('#load_errList').text("Please fill in all fields!");
+                }else{
+
+                    var data = {
+                        'ProductID' : prodId,
+                        'LoadAmount': amount,
+                    };
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.ajax({
+                        type: "PUT",
+                        url: "eload/storeEload",
+                        data: data,
+                        success: function (response) {
+                            if (response.status == 200) {
+                                Swal.fire(
+                                "Success!",
+                                "" + response.message + "",
+                                "success"
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            }else{
+                                $('#load_errList').html("");
+                                $('#load_errList').addClass('alert alert-danger');
+                                $('#load_errList').text("Error! Something went wrong!");
+                            }
+                        }
+                    });
+                }
+            });
+
         });
+
 
 
             var subTotals = [];

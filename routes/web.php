@@ -27,12 +27,12 @@ use App\Http\Controllers\LiveSearch;
 
 
 
- if (User::exists()) {
-     Route::get('/', function () {
+if (User::exists()) {
+    Route::get('/', function () {
         return view('auth.login');
     });
- } else {
-     Route::get('/', function () {
+} else {
+    Route::get('/', function () {
         return view('firstSetup');
     });
 }
@@ -48,9 +48,9 @@ use App\Http\Controllers\LiveSearch;
 
 Route::get('/reportPreview', function () {
     return view('reportPreview');
-     });
+});
 
-     Route::get('/exportToPDF',[HomeController::class,'adminGenerateReport']);
+    Route::get('/exportToPDF',[HomeController::class,'adminGenerateReport']);
 
 
 
@@ -90,9 +90,12 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::get('transactionDetails/{id}', [HomeController::class, 'transactionDetails'])->name('admin.transactionDetails');
     Route::get('transactions/edit/{id}', [HomeController::class, 'editTransaction'])->name('admin.editTransaction');
     Route::put('transactions/update/{id}', [HomeController::class, 'updateTransaction'])->name('admin.updateTransaction');
-    Route::get('samePricedProducts/{a}', [HomeController::class, 'viewSamePricedProducts']);
+    Route::get('viewSamePricedProducts/{id}', [HomeController::class, 'viewSamePricedProducts'])->name('admin.viewSame');
 
     Route::get('eload', [HomeController::class, 'adminEload'])->name('admin.eload');
+    Route::put('eload/storeEload', [HomeController::class, 'storeEload'])->name('admin.storeEload');
+    Route::put('eload/filter', [HomeController::class, 'filterPromos'])->name('admin.filterPromos');
+    Route::get('eload/getPromoPrice/{id}', [HomeController::class, 'getPromoPrice'])->name('admin.getPromoPrice');
 
     Route::get('searchUnderCategory', [HomeController::class, 'action']);
 
@@ -110,7 +113,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::get('reports', [HomeController::class, 'adminReports'])->name('admin.reports');
     Route::get('reports/generate',[HomeController::class, 'adminGenerateReport']);
     Route::get('/reports/generate2',[HomeController::class, 'adminGenerateReport2']);
-   
+
     // Route::get('/admin/PDF',[HomeController::class,'createPDF']);
 
     Route::get('admin/transactions/add', function () {

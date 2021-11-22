@@ -18,11 +18,11 @@
             <div class="col-2">
                 <button class="btn btn-yellow" type="button" onclick="document.location='{{ route('admin.transactions') }}'">Transactions</button>
             </div>
-        </div>     
+        </div>
 
     </div>
 
-    
+
     <div class="container" style="margin-top: 10px; width: 50%;">
         <div class="row">
             <div class="card text-white mb-3 blue-bg">
@@ -36,7 +36,7 @@
                     <div class="row">
                         <div class = "col-md-2">
                             <label for="SaleId" class="col col-form-label">Sales ID</label>
-                            
+
                         </div>
                         <div class="col-md-5">
                             @foreach ($sales as $sale)
@@ -64,13 +64,13 @@
                             @foreach ($sales as $sale)
                             <input id = "SaleId" class="form-control" readonly value="{{ $sale->SalesID }}">
                             @endforeach
-                        </div>  
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
 
     <div class="container" style="margin-top: 10px">
         <div class="row">
@@ -90,13 +90,13 @@
                                     <div class="col">
                                         @foreach ($sales as $sale)
                                         <input id = "personInCharge" class="form-control" readonly value="{{ $sale->PersonInCharge }}">
-                                        <input id = "salesID" class="form-control" readonly value="{{ $sale->SalesID }}"> 
+                                        <input id = "salesID" class="form-control" readonly value="{{ $sale->SalesID }}">
                                         @endforeach
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <hr>
 
                         <div class="row">
@@ -119,7 +119,7 @@
                                                 <td id="{{$detail->ProductName}}Price">{{$detail->ProductPrice}}</td>
                                                 <td id="{{$detail->ProductName}}Quantity">{{$detail->Quantity}}</td>
                                                 <td id="{{$detail->ProductName}}SubTotal">{{($detail->ProductPrice)*($detail->Quantity)}}</td>
-                                                
+
                                                 <td>
                                                     <button class="btn btn-primary addQuant" value="{{$detail->ProductName}}" type="button"><i class="fas fa-plus"></i></button>
                                                     <button class="btn btn-primary subQuant" value="{{$detail->ProductName}}" type="button"><i class="fas fa-minus"></i></button>
@@ -141,12 +141,12 @@
                                             <label for="total" class="col-sm-7 col-form-label">Total</label>
                                             <div class="col-sm-5">
                                                 @foreach ($details as $detail)
-                                                <input id = "total" class="form-control" placeholder="0.00" readonly value="{{number_format($detail->AmountDue, 2)}}"> 
+                                                <input id = "total" class="form-control" placeholder="0.00" readonly value="{{number_format($detail->AmountDue, 2)}}">
                                                 @endforeach
                                             </div>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
 
@@ -167,25 +167,29 @@
     <script>
 
         function newProduct(selectedOpt){
-            var price = selectedOpt.value;
-            console.log(a);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            var id = selectedOpt.value;
+            var SaleId = $('#SaleId').val();
+            //console.log(price);
 
             $.ajax({
                 type: "GET",
-                header: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                },
-                url: "samePricedProducts/" + price,
-                dataType: "json",
+                url: SaleId+"/editProduct/"+id,
                 success: function (response) {
-                    if(response.status == 400){
+                    if(response.status == 200){
                         console.log("works")
                         //console.log(response.products);
+                    }else{
+                        console.log('error');
                     }
                 }
             });
         }
-        //format should be year/month/date 
+        //format should be year/month/date
         var dt = new Date().toLocaleString();
         var initialPrice=[];
         var toBeUpdated = [];
@@ -204,7 +208,7 @@
                         initialPrice.push(a);
                         break;
                     }
-                }  
+                }
             }
             console.log(toBeUpdated);
             console.log(initialPrice);
@@ -213,7 +217,7 @@
         function calculateChange(){
             productName = document.getElementById('btn').value;
             console.log(productName);
-            
+
             /*cash = document.getElementById("cash").value;
             subTotal = document.getElementById("total").value;
 
@@ -229,7 +233,7 @@
             'PersonInCharge': $('#personInCharge').val(),
             'ModeOfPayment': 'Cash',
             'AmountToPay': $('#total').val(),
-            'AmountTendered': $('#cash').val(),            
+            'AmountTendered': $('#cash').val(),
         }
         $.ajaxSetup({
             headers: {
@@ -243,7 +247,7 @@
             data: data,
             dataType: "json",
             success: function(response){
-            
+
                 if(response.status == 400){
                 $('#saveform_errList').html("");
                 $('#saveform_errList').addClass('alert alert-danger');
@@ -260,7 +264,7 @@
         });
         console.log(data);
 
-        
+
     });
         var toBeRemoved = []
     $(document).on('click', '.removeItem', function(e){
@@ -277,7 +281,7 @@
         console.log(toBeRemoved);
         document.getElementById(ProductName).remove();
     });
-    
+
     $(document).on('click', '.addQuant', function(e){
         var ProductName = $(this).val(); // this is to get ProductName
         var total = document.getElementById('total').value;
@@ -290,7 +294,7 @@
             var total1;
             total1 = parseInt(total) + parseInt(Price1);
             console.log('total: '+total1);
-            
+
         if(total1 > cash){
             Swal.fire(
                     "Hold It!",
@@ -309,18 +313,18 @@
             document.getElementById(''+ProductName+'Quantity').innerHTML = newQuant;
 
             document.getElementById(''+ProductName+'SubTotal').innerHTML = newQuant * Price;
-            
+
             toBeUpdated.forEach(element => {
                 if (element.name == ProductName) {
                     element.quantity = newQuant;
                     console.log(toBeUpdated);
                 }
             });
-        
+
             totalPrice();
             calculateChange();
         }
-        
+
     });
 
     $(document).on('click', '.subQuant', function(e){
@@ -414,7 +418,7 @@
     });
 
     function totalPrice(){
-        
+
             var table = document.getElementById("tableBody");
             for (let i in table.rows) {
                 let row = table.rows[i]
@@ -428,9 +432,9 @@
                         initialPrice.splice(i, 3, a);
                         break;
                     }
-                }  
+                }
             }
-            
+
             //Reduce and then update
             ftotal = initialPrice.reduce(function(a,b){
                     return a + b;
