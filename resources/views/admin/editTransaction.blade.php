@@ -167,7 +167,7 @@
     <script>
 
         function newProduct(selectedOpt){
-            var a = selectedOpt.value;
+            var price = selectedOpt.value;
             console.log(a);
 
             $.ajax({
@@ -175,7 +175,7 @@
                 header: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
-                url: "samePricedProducts/" + a,
+                url: "samePricedProducts/" + price,
                 dataType: "json",
                 success: function (response) {
                     if(response.status == 400){
