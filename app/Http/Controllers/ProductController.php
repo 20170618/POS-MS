@@ -24,7 +24,8 @@ class ProductController extends Controller
     {
         //
         $products = Product::where('Category','=',$id)->get();
-        return (compact('products'));
+        $category = $id;
+        return (compact('products', 'category'));
         
     }
 
@@ -56,10 +57,10 @@ class ProductController extends Controller
     {
         //
         $validator = Validator::make($request->all(), [
-            'ProductName' =>['required', 'max:50', 'regex:/^[a-zA-Z0-9 ]+$/'],
-            'Price' =>'required|min:1.00',
+            'ProductName' =>['required', 'max:50', 'unique:product,ProductName','regex:/^[a-zA-Z0-9 ()]+$/'] ,
+            'Price' =>['required', 'min:1', 'not_in:0'],
             'Category' =>'required',
-            'Stock' => ['required', 'min:0.00'],
+            'Stock' => ['required', 'min:0', 'numeric'],
         ]);
 
         if($validator->fails()){
@@ -132,25 +133,25 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'ProductName' =>'required|max:191',
-            'Price' =>'required|min:1.00',
-            'Stock' => ['required', 'min:0.00'],
+            'ProductName' =>['required', 'max:50', 'unique:product,ProductName,'.$id.','.'ProductID'.'','regex:/^[a-zA-Z0-9 ()]+$/'] ,
+            'Price' =>['required', 'min:1', 'not_in:0'],
+            'Category' =>'required',
+            'Stock' => ['required', 'min:0', 'numeric'],
         ]);
 
-        if($validator->fails())
-        {
+        if($validator->fails()){
             return response()->json([
                 'status'=>400,
-                'errors'=>$validator,
+                'errors'=>$validator->errors()->all(),
+                'error'=>'Please fill all fields'
             ]);
-        }
-        else
-        {
+        }else{
             $product = Product::find($id);
             if($product)
             {
                 $product->ProductName = $request->input('ProductName');
                 $product->Price = $request->input('Price');
+                $product->Category = $request->input('Category');
                 $product->Stock = $request->input('Stock');
                 $product->update();
                 return response()->json([

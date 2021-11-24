@@ -18,7 +18,8 @@
                             <i class="fas fa-user-circle fa-7x" style="margin-top: 10%;color: white"></i>
                         </div>
                         <div class="row" style="margin-top: 20px">
-                            <h4 class="yellow">{{ Auth::user()->FirstName }} {{ Auth::user()->LastName }}</h4>
+                            <h4 class="yellow">{{ Auth::user()->FirstName }} {{ Auth::user()->LastName }}</h4><br>
+                            <h6 class="text-white">{{ Auth::user()->email }}</h6>
                         </div>
 
                     </div>
@@ -41,8 +42,13 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="email" class="form-label mt-4">Email</label>
-                                <input type="email" class="form-control" id="email" placeholder="Email" disabled="" value="{{ Auth::user()->email }}" required>
+                                <label for="ContactNo" class="form-label mt-4">Contact No.</label>
+                                <input type="text" class="form-control" id="ContactNo" placeholder="09XXXXXXXXX" disabled="" value="{{ Auth::user()->ContactNo }}" required maxlength="11">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="EmContactNo" class="form-label mt-4">Emergency Contact No.</label>
+                                <input type="text" class="form-control" id="EmContactNo" placeholder="09XXXXXXXXX" disabled="" value="{{ Auth::user()->EmContactNo }}" required maxlength="11">
                             </div>
 
                             &nbsp;
@@ -50,9 +56,7 @@
                             <div class="row" style="align-content: center; text-align: center;" >
                                 <div class="form-group">
                                 @if (Route::has('password.request'))
-                                    <a  href="{{ route('password.request') }}">
-                                    <button type="button" id="password" class="btn btn-yellow blue"><b>Change Password</b></button>
-                                    </a>
+                                    <button type="button" id="changepasswordbutton" class="btn btn-yellow blue changepassmodal"><b>Change Password</b></button>
                                  @endif
                                     <button type="button" id="edit" class="btn btn-yellow blue"><b>Edit</b></button>
 
@@ -73,6 +77,31 @@
 
         </div>
     </div>
+
+    <div id="changePassword" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header blue-bg yellow">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+            hello
+                
+            </div> 
+            
+          
+            <div class="modal-footer" style="text-align: right">
+                <button class="btn btn-yellow delete_product_btn" type="button" id="delete_product_btn">Save Changes</button>
+                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     <script src="../../js/admin-edit-profile.js"></script>
 @endsection

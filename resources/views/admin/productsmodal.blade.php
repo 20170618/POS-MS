@@ -19,26 +19,34 @@
 
                 <div class="form-group">
                     <label for="prodCategory" class="form-label mt-3">Product Category</label>
-                    <select class="form-select" id="prodCategory">
-                        <option>Consumable</option>
-                        <option>Non-Consumable</option>
-                        <option>E-Load Regular</option>
-                        <option>E-Load Promo</option>
+                    <select class="form-select" id="prodCategory" name="prodCategory" onchange="changeDisplayCategory()">
+                        <option value="Consumable" id="C">Consumable</option>
+                        <option value="Non-Consumable" id="NC">Non-Consumable</option>
+                        <option value="E-Load Promo" id="EP">E-Load Promo</option>
                     </select>
-                    </div>
+                </div>
 
-                <div class="form-group">
+                <div class="form-group" id="PPrice">
                     <label class="form-label mt-4">Product Price</label>
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" placeholder="0.00" name="prodPrice" id="prodPrice" min="1.00"> 
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="PStock">
                     <label>Product Stock</label>
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" placeholder="0" name="prodStock" id="prodStock" min="0"> 
                     </div>
+                </div>
+
+                <div class="form-group" id="POperator" hidden>
+                    <label for="prodOperator" class="form-label mt-3">E-Load Operator</label>
+                    <select class="form-select" id="prodOperator" name="prodOperator">
+                        <option value="1" id="1">SMART/TNT</option>
+                        <option value="2" id="2">GLOBE/TM</option>
+                        <option value="3" id="3">SUN</option>
+                    </select>
                 </div>
             </div> 
           
@@ -75,7 +83,7 @@
                 <div class="row">
                     <div class="container">
                         <table class="table table-hover" id="productsTable">
-                            <thead style="text-align: center">
+                            {{-- <thead style="text-align: center">
                             <tr class="table-yellow">
                                 <th scope="col">Name</th>
                                 <th scope="col">Price</th>
@@ -86,7 +94,7 @@
                             <tbody>
                                    
 
-                            </tbody>
+                            </tbody> --}}
                         </table>
                     </div>
                 </div>
@@ -109,7 +117,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="saveform_errList"></div>
+                
                 <input type="hidden" id="delete_p_id">
                 <p>
                     You're about to delete this product:
@@ -159,7 +167,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="saveform_errList"></div>
+                <div id="updateform_errList"></div>
                 <p>
                     You're about to edit this product's details:
                 </p>

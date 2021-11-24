@@ -116,7 +116,8 @@
         <div style="container-lg">
                 <br>
                 <h1 style="text-align:center">Migui's Store Report</h1>
-
+                    <h4>Start date:</h4>
+                    <h4>End date:</h4>
                         <table style="table table-bordered mb-5">
                             <thead>
                                 <tr>
@@ -126,15 +127,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($data as $d)
+
                                 <tr>
-                                    <td>{{$d->ProductName}}</td>
-                                    <td>{{$d->Category}}</td>
-                                    <td>{{$d->Stock}}</td>
+                                    <td>Product Name</td>
+                                    <td>Category</td>
+                                    <td>0</td>
                                   
                                 </tr>
                                     
-                                @endforeach
+                           
 
                                 
 

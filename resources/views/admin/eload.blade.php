@@ -18,6 +18,17 @@
                 <button class="btn btn-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addPromoModal">E-Load Promo Order</button>
             </div>
         </div>
+        
+        <div class = "container py-5">
+            <div class="card text-white mb-3 blue-bg">
+                <div class="card-header">
+                    <h3 class="yellow">Wallet Balance: </h3>
+                </div>
+                <div class="card-body yellow">
+                
+                </div>
+            </div>
+        </div>
 
     </div>
 

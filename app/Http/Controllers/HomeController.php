@@ -328,6 +328,10 @@ class HomeController extends Controller
                 $salesDetails->Quantity = $data_ID['quantity'];
                 $salesDetails->LoadAmount = $data_ID['quantity'];
                 $salesDetails->save();
+
+                $prod = Product::find($data_ID['id']);
+                $prod->Stock = $prod->Stock - $data_ID['quantity'];
+                $prod->update();
             }
 
             return response()->json([
@@ -379,6 +383,10 @@ class HomeController extends Controller
                     $salesDetails->Quantity = $data_ID['quantity'];
                     $salesDetails->LoadAmount = $data_ID['quantity'];
                     $salesDetails->save();
+
+                    $prod = Product::find($data_ID['id']);
+                    $prod->Stock = $prod->Stock - $data_ID['quantity'];
+                    $prod->update();
                 }
 
                 return response()->json([
@@ -461,7 +469,7 @@ class HomeController extends Controller
 
     }
 
-    public function adminGenerateReport(Request $request){
+    public function adminGenerateReport2(Request $request){
         $now = Carbon::now();
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
@@ -481,7 +489,7 @@ class HomeController extends Controller
         return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
     }
 
-    public function adminGenerateReport2(Request $request){
+    public function adminGenerateReport(Request $request){
             $now = Carbon::now();
             $startDate = $request->input('startDate');
             $endDate = $request->input('endDate');
@@ -511,34 +519,34 @@ class HomeController extends Controller
         $title = "Migui's Store Report";
         $output = '
         <head>
-            <style>
-            .page-break {
-                page-break-after: always;
-            }
+                <style>
+                    .page-break {
+                        page-break-after: always;
+                    }
 
-        body {
-            font-family: "Trebuchet MS", sans-serif;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
+                    body {
+                        font-family: "Trebuchet MS", sans-serif;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
 
-        th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: #343a41;;
-            color: white;
-        }
+                    th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #343a41;;
+                        color: white;
+                    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
 
 
-            </style>
+             </style>
         </head>
         <body>
         <div class="row">
@@ -596,6 +604,7 @@ class HomeController extends Controller
         </body>
         </html>';
         return $output;
+        
     }
 
 
@@ -748,8 +757,9 @@ class HomeController extends Controller
                     <tr style = "color:white;">
                         <td>'.$row->ProductName.'</td>
                         <td>'.$row->Category.'</td>
+                        <td>'.$row->Stock.'</td>
                         <td style = "text-align:center;">'.number_format($row->Price, 2).'</td>
-                        <td style = "text-align:center;"><button onclick="addToInvoice(\' '.$row->ProductName.' \', \' '.$row->Price.' \' ,\' '.$row->ProductID.' \' )" class = "btn btn-primary" id = "add"> Add </button></td>
+                        <td style = "text-align:center;"><button onclick="addToInvoice(\' '.$row->ProductName.' \', \' '.$row->Price.' \' ,\' '.$row->ProductID.'\' ,\' '.$row->Stock.' \')" class = "btn btn-primary" id = "add"> Add </button></td>
                     </tr>
                     ';
                     }
@@ -897,47 +907,4 @@ class HomeController extends Controller
     }
 
 
-
-    // public function createPDF(){
-    //     // retrieve all records from db
-    //     $now = Carbon::now();
-    //     // $check = $request->input('checkedRadio');
-
-    //     // if($check =='MonthlyRadio'){
-    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/'.$now->month.'/'.$now->year.' 00:00:00');
-    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/'.$now->month.'/'.$now->year.' 23:59:59');
-
-    //     //     $transactions=DB::table('sales')
-    //     //         ->whereBetween('created_at', [$startDate, $endDate])
-    //     //         ->get();
-
-    //     //     echo $transactions;
-
-    //     // }else if($check=='AnnualRadio'){
-    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', '01/01/'.$now->year.' 00:00:00');
-    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', '31/12/'.$now->year.' 23:59:59');
-
-    //     //     $transactions=DB::table('sales')
-    //     //         ->whereBetween('created_at', [$startDate, $endDate])
-    //     //         ->get();
-
-    //     //     echo $transactions;
-    //     // }else if($check=='DailyRadio'){
-    //     //     $startDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 00:00:00');
-    //     //     $endDate = Carbon::createFromFormat('d/m/Y H:i:s', ''.$now->day.'/'.$now->month.'/'.$now->year.' 23:59:59');
-
-    //     //     $transactions=DB::table('sales')
-    //     //         ->whereBetween('created_at', [$startDate, $endDate])
-    //     //         ->get();
-
-    //     //     echo $transactions;
-    //     // }
-    //     // share data to view
-
-    //     $data="sample";
-    //      $pdf = PDF::loadview('exportToPDF', ['data'=>$data]);
-
-
-    //     return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
-    // }
 }

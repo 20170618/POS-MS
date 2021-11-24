@@ -88,36 +88,44 @@
                                     <hr>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
-                                            id="allCheck" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="consumable"
+                                            id="consumable" name="Category">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Consumable
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
-                                            id="allCheck" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="nonComsuble"
+                                            id="nonComsuble" name="Category">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Non-Consumable
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
-                                            id="allCheck" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="eLoadRegular"
+                                            id="eLoadRegular" name="Category">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             E-Load Regular
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
-                                            id="allCheck" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="eLoadPromo"
+                                            id="eLoadPromo" name="Category">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             E-Load Promo
                                         </label>
                                     </div>
+
+                                    <!-- <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="debts"
+                                            id="debts" name="Category">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                           Debts
+                                        </label>
+                                    </div> -->
 
                                     
 
@@ -128,6 +136,43 @@
 
                                 </div>
 
+                                <div class="col">
+                                    <h6 style="text-align: center">Mode of Payment</h6>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheckPayment"
+                                            id="allCheckPayment" name="modeOfPayment">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            All
+                                        </label>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="cash"
+                                            id="Cash" name="modeOfPayment">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            Cash
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input allCheck" type="checkbox" value="credit"
+                                            id="credit" name="modeOfPayment">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            Credit
+                                        </label>
+                                    </div>
+
+                                   
+
+                                
+                                    </fieldset>
+
+
+
+                                </div>
 
 
                                 <div class="col">
@@ -145,6 +190,7 @@
                                     </fieldset>
                                 </div>
 
+                              
 
 
                             </div>
@@ -157,9 +203,10 @@
             </div>
             <div class="card-footer" style="text-align: right">
             <a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>
+          
             </div>
 
-            <button class="btn" id="GenerateButton">Generate 2</button>
+            <!-- <button class="btn btn-yellow" id="GenerateButton">Generate 2</button> -->
         </div>
 
 

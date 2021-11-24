@@ -142,6 +142,8 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'FirstName' =>'required',
             'LastName' =>'required',
+            'ContactNo' =>'required',
+            'EmContactNo' =>'required',
         ]);
 
         if($validator->fails())
@@ -158,6 +160,8 @@ class UserController extends Controller
             {
                 $user->FirstName = $request->input('FirstName');
                 $user->LastName = $request->input('LastName');
+                $user->ContactNo = $request->input('ContactNo');
+                $user->EmContactNo = $request->input('EmContactNo');
                 $user->update();
                 return response()->json([
                     'status'=>200,

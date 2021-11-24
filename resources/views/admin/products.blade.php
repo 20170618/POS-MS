@@ -14,13 +14,13 @@
             <button type="button" class="btn btn-blue btn-lg view_product" value="Consumable" id="view_product">Consumable</button>
         </div>
         <div class="d-inline-block">
-            <button type="button" class="btn btn-blue btn-lg view_product" value="Non-consumable" id="view_product">Non-Consumable</button>
+            <button type="button" class="btn btn-blue btn-lg view_product" value="Non-Consumable" id="view_product">Non-Consumable</button>
         </div>
         <div class="d-inline-block">
-            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Regular" id="view_product">E-load Regular</button>
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Regular" id="view_product">E-Load Regular</button>
         </div>
         <div class="d-inline-block">
-            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Promo" id="view_product">E-load Promo</button>
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Promo" id="view_product">E-Load Promo</button>
         </div>
 
         <hr>

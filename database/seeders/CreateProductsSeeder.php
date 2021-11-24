@@ -26,19 +26,19 @@ class CreateProductsSeeder extends Seeder
                 'ProductName' => 'Smart/TNT Regular Load',
                 'Category' => 'E-Load Regular', //CategoryID
                 'Price' => null,
-                'Stock' => '24000'
+                'Stock' => '25000',
             ],
             [
                 'ProductName' => 'Globe/TM Regular Load',
                 'Category' => 'E-Load Regular', //CategoryID
                 'Price' => null,
-                'Stock' => '24000'
+                'Stock' => '25000',
             ],
             [
                 'ProductName' => 'Sun Regular Load',
                 'Category' => 'E-Load Regular', //CategoryID
                 'Price' => null,
-                'Stock' => '24000'
+                'Stock' => '25000',
             ],
             [
                 'ProductName' => 'Porkchop Loin 1KG',
@@ -258,5 +258,6 @@ class CreateProductsSeeder extends Seeder
         foreach ($product as $key => $value) {
             Product::create($value);
         }
+
     }
 }

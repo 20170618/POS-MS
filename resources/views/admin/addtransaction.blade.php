@@ -28,7 +28,6 @@
                             id="debtName" required>
                     </div>
 
-
                     <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example"
                         tabindex="0">
                         <p>New debtor must not have any running debts.</p>
@@ -51,7 +50,6 @@
                             </tbody>
                         </table>
                     </div>
-
 
                 </div>
 
@@ -123,6 +121,7 @@
                                         <tr class="table-yellow" style="text-align: center">
                                             <th scope="col">Name</th>
                                             <th scope="col">Category</th>
+                                            <th scope="col">Stock</th>
                                             <th scope="col">Price</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -167,12 +166,11 @@
                             </div>
 
                             <hr>
-
                             <div class="row">
                                 <div class="container">
                                     <table id="invoiceTable" class="table table-hover table-light">
 
-
+                                    <div class="d-flex" id="cash_error"  style="width:100%"></div>
 
                                         <thead>
                                             <tr class="table yellow">
@@ -190,6 +188,7 @@
                                     <hr>
 
                                     <div class="row">
+                                        
                                         <div class="col">
                                             <div class="form-group row">
                                                 <label for="total" class="col-sm-7 col-form-label">Total</label>
@@ -268,105 +267,26 @@
         var products = [];
         var xy = 0;
 
-        function addToInvoice(ProdName, Price, ProdId) {
+        function addToInvoice(ProdName, Price, ProdId, Stock) {
             var tab = document.getElementById("invoiceTable");
             var rowLength = tab.rows.length;
 
+            
             quantity = document.getElementById("quantity").value;
             var quantInt = parseInt(quantity);
+            var intStock = parseInt(Stock);
 
             var status = true;
 
-            //If object is empty,
-            if (products.length == 0) {
-                products.push({
-                    id: ProdId,
-                    quantity: quantInt
-                });
-                console.log(products);
-
-                var table = document.getElementById("invoiceTable"),
-                    newRow = table.insertRow(table.length),
-                    nameCell = newRow.insertCell(0),
-                    priceCell = newRow.insertCell(1),
-                    quantityCell = newRow.insertCell(2),
-                    subTotalCell = newRow.insertCell(3),
-                    //console.log(ProdId);
-                    subTotal = Price * quantity;
-                subTotals.push(subTotal);
-
-
-
-                ftotal = subTotals.reduce(function(a, b) {
-                    return a + b;
-                }, 0);
-
-                document.getElementById("total").value = ftotal.toFixed(2);
-
-
-                //console.log(products);
-
-                nameCell.innerHTML = ProdName;
-                priceCell.innerHTML = Price;
-                quantityCell.innerHTML = quantity;
-                subTotalCell.innerHTML = subTotal;
-            } else {
-
-                for (let i = 0; i < products.length; i++) {
-                    if (products[i].id == ProdId) {
-                        console.log("Product already there with the ID:" + products[i].id +
-                            "Therefore, we just add the quantity.");
-                        status = true;
-                        products[i].quantity += quantInt;
-                        //console.log(products);
-
-                        var table = document.getElementById("invoiceTable");
-                        var totalRows = table.rows.length;
-                        console.log("rows:" + totalRows);
-                        for (let index = 1; index < totalRows; index++) {
-                            console.log(table.rows[index].cells[2].innerHTML);
-
-                            if (table.rows[index].cells[0].innerHTML == ProdName) {
-
-                                console.log("found it!");
-                                table.rows[index].cells[2].innerHTML = products[i].quantity;
-                                Price = table.rows[index].cells[1].innerHTML;
-                                subTotal = Price * products[i].quantity;
-                                table.rows[index].cells[3].innerHTML = subTotal;
-
-                                //subTotal = Price * quantity
-                                // var subt;
-                                // for (let ind = 1; ind < totalRows; ind++) {
-                                //     subt += table.rows[index].cells[3].innerHTML;
-                                // }
-                                // console.log("subt:"+subt);
-                                subTotals.splice(index - 1, 1, subTotal);
-                                // second arg defines how many to delete, so 1 only
-                                //subTotals.push(subTotal);
-
-                                console.log(products);
-                                console.log(subTotals);
-
-                                ftotal = subTotals.reduce(function(a, b) {
-                                    return a + b;
-                                }, 0);
-
-                                document.getElementById("total").value = ftotal.toFixed(2);
-                                break;
-                            } else {
-                                console.log("nothing there to look for");
-                                console.log(table.rows[index].cells[0]);
-                            }
-                        }
-
-                        break;
-                    } else {
-                        console.log("Product is unique therefore we add");
-                        status = false;
-                    }
-                }
-
-                if (!status) {
+            if(Stock < quantInt){
+                Swal.fire(
+                    'Error!',
+                    'Insufficient stock!',
+                    'error'
+                )
+            }else{
+                //If object is empty,
+                if (products.length == 0) {
                     products.push({
                         id: ProdId,
                         quantity: quantInt
@@ -379,11 +299,8 @@
                         priceCell = newRow.insertCell(1),
                         quantityCell = newRow.insertCell(2),
                         subTotalCell = newRow.insertCell(3),
-                        //console.log(ProdId);
                         subTotal = Price * quantity;
-                    // push SubTotal to arra
                     subTotals.push(subTotal);
-
 
 
                     ftotal = subTotals.reduce(function(a, b) {
@@ -392,16 +309,129 @@
 
                     document.getElementById("total").value = ftotal.toFixed(2);
 
-
-                    //console.log(products);
-
                     nameCell.innerHTML = ProdName;
                     priceCell.innerHTML = Price;
                     quantityCell.innerHTML = quantity;
                     subTotalCell.innerHTML = subTotal;
-                }
+                } else {
+                    for (let i = 0; i < products.length; i++) {
+                        if (products[i].id == ProdId) {
+                            var a = products[i].quantity + quantInt;
+                            var qty = products[i].quantity;
 
+                            if(a <= Stock){
+                                console.log("Product already there with the ID:" + products[i].id +
+                                "Therefore, we just check the quantity if it's possible to add.");
+                                
+                                status = true;
+                                products[i].quantity += quantInt;
+
+                                var table = document.getElementById("invoiceTable");
+                                var totalRows = table.rows.length;
+                                console.log("rows:" + totalRows);
+                                for (let index = 1; index < totalRows; index++) {
+                                    console.log(table.rows[index].cells[2].innerHTML);
+
+                                    if (table.rows[index].cells[0].innerHTML == ProdName) {
+
+                                        console.log("found it!");
+                                        table.rows[index].cells[2].innerHTML = products[i].quantity;
+                                        Price = table.rows[index].cells[1].innerHTML;
+                                        subTotal = Price * products[i].quantity;
+                                        table.rows[index].cells[3].innerHTML = subTotal;
+
+                                        //subTotal = Price * quantity
+                                        // var subt;
+                                        // for (let ind = 1; ind < totalRows; ind++) {
+                                        //     subt += table.rows[index].cells[3].innerHTML;
+                                        // }
+                                        // console.log("subt:"+subt);
+                                        subTotals.splice(index - 1, 1, subTotal);
+                                        // second arg defines how many to delete, so 1 only
+                                        //subTotals.push(subTotal);
+
+                                        console.log(products);
+                                        console.log(subTotals);
+
+                                        ftotal = subTotals.reduce(function(a, b) {
+                                            return a + b;
+                                        }, 0);
+
+                                        document.getElementById("total").value = ftotal.toFixed(2);
+                                        break;
+                                    } else {
+                                        console.log("nothing there to look for");
+                                        console.log(table.rows[index].cells[0]);
+                                    }
+                                }
+
+                                break;
+                            }else{
+                                var x = intStock - qty;
+
+                                if(x == 0){
+                                    Swal.fire(
+                                    'Error!',
+                                    "Maximum reached! You can't add more!",
+                                    'error'
+                                    )
+                                }else{
+                                    Swal.fire(
+                                    'Error!',
+                                    'Insufficient stock! At most, you can only add '+x+'!',
+                                    'error'
+                                    )
+                                }
+                                
+                                status = true;
+                                break;
+                            }
+                                break;
+                        } else {
+                            console.log("Product is unique therefore we add");
+                            status = false;
+                        }
+                    }
+
+                    if (!status) {
+                        products.push({
+                            id: ProdId,
+                            quantity: quantInt
+                        });
+                        console.log(products);
+
+                        var table = document.getElementById("invoiceTable"),
+                            newRow = table.insertRow(table.length),
+                            nameCell = newRow.insertCell(0),
+                            priceCell = newRow.insertCell(1),
+                            quantityCell = newRow.insertCell(2),
+                            subTotalCell = newRow.insertCell(3),
+                            //console.log(ProdId);
+                            subTotal = Price * quantity;
+                        // push SubTotal to arra
+                        subTotals.push(subTotal);
+
+
+
+                        ftotal = subTotals.reduce(function(a, b) {
+                            return a + b;
+                        }, 0);
+
+                        document.getElementById("total").value = ftotal.toFixed(2);
+
+
+                        //console.log(products);
+
+                        nameCell.innerHTML = ProdName;
+                        priceCell.innerHTML = Price;
+                        quantityCell.innerHTML = quantity;
+                        subTotalCell.innerHTML = subTotal;
+                    }
+
+                }
             }
+
+
         }
 
         function reloadInvoice() {
@@ -421,6 +451,9 @@
         }
 
         function calculateChange() {
+            $('#cash_error').removeClass('alert alert-danger');
+            $('#cash_error').val("");
+
             cash = document.getElementById("cash").value;
             subTotal = document.getElementById("total").value;
 
@@ -433,7 +466,6 @@
                 products,
                 'PersonInCharge': $('#personInCharge').val(),
                 'ModeOfPayment': 'Cash',
-
             }
 
             $.ajaxSetup({
@@ -474,7 +506,7 @@
         $('#addDebtorModal').on('hidden.bs.modal', function () {
             $('#debt_errList').removeClass('alert alert-danger');
             $('#debtName').val("");
-        })
+        });
 
         function storeDebt() {
             var balance = $('#total').val() - $('#cash').val();
@@ -531,12 +563,23 @@
 
         $(document).on('click', '.storeTransaction', function(e) {
             e.preventDefault();
-            var cash = parseInt($('#cash').val());
-            var total = parseInt($('#total').val());
-
-            if (cash == 0 || cash == null || cash < total) {
+            var cash = parseFloat($('#cash').val());
+            var total = parseFloat($('#total').val());
+            var checkEmpty = $('#cash').val();
+            var percentage1 = total/2;
+            if (cash < percentage1) {
+                    console.log('half: '+percentage1);
+                    console.log('total: '+total);
+                    $('#cash_error').html("");
+                    $('#cash_error').addClass('alert alert-danger');
+                    $('#cash_error').text("Downpayment for debt should at least be Php "+percentage1.toFixed(2)+", or <b>50% of the Total!");  
+            }else if(cash >= percentage1){
                 $('#addDebtorModal').modal('show');
-            } else {
+            } else if(checkEmpty == ""){
+                $('#cash_error').html("");
+                $('#cash_error').addClass('alert alert-danger');
+                $('#cash_error').text("Please fill in all fields!");
+            }else{
                 storeTransaction();
             }
         });

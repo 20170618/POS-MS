@@ -1,3 +1,19 @@
+function changeDisplayCategory() {
+  var cat = document.getElementById("prodCategory").value;
+  if(cat == "Consumable" || cat == "Non-Consumable"){
+    document.getElementById('PPrice').hidden = false;
+    document.getElementById('PStock').hidden = false;
+    document.getElementById('POperator').hidden = true;
+  }else if(cat == "E-Load Regular"){
+    document.getElementById('PPrice').hidden = true;
+    document.getElementById('PStock').hidden = true;
+    document.getElementById('POperator').hidden = false;
+  }else if(cat == "E-Load Promo"){
+    document.getElementById('PPrice').hidden = false;
+    document.getElementById('PStock').hidden = true;
+    document.getElementById('POperator').hidden = false;
+  }
+}
 
 // Add Food
 $(document).on('click', '.add_product', function (e) {
@@ -56,21 +72,38 @@ $(document).on('click', '.view_product', function (e) {
   $('#productName').val("");
   categoryClick = $(this).val();
   var c_id = $(this).val();
-  $("#productsTable tbody").html('');
+  $("#productsTable").html('');
   $('#viewProductModal').modal('show');
   $.ajax({
     type: "GET",
     url: "products/view-products/" + c_id,
     success: function (data) {
       var len = data.products.length;
+      console.log(data.category);
 
+      var tableHeader = "<thead style='text-align: center'>\
+      <tr class='table-yellow'>\
+          <th scope='col'>Name</th>\
+          <th scope='col'>Price</th>\
+          <th scope='col'>Stock</th>\
+          <th scope='col'>Actions</th>\
+      </tr>\
+      </thead>";
+
+      $("#productsTable").append(tableHeader);
+
+      var tableStart =
+      "</thead>\
+      <tbody>";
+      $("#productsTable").append(tableStart);
       for (var i = 0; i < len; i++) {
         var id = data.products[i].ProductID;
         var productN = data.products[i].ProductName;
         var productP = data.products[i].Price;
         var productS = data.products[i].Stock;
-
-        var tr_str = "<tr style='text-align: center'>" +
+        if (productS <= 5) {
+          var tr_str = 
+          "<tr style='text-align: center' class='table-yellow'>" +
           "<td align='center'>" + productN + "</td>" +
           "<td align='center'>" + productP + "</td>" +
           "<td align='center'>" + productS + "</td>" +
@@ -78,8 +111,20 @@ $(document).on('click', '.view_product', function (e) {
           "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
           "</tr>";
 
-        $("#productsTable tbody").append(tr_str);
+        } else {
+          var tr_str = "<tr style='text-align: center'>" +
+          "<td align='center'>" + productN + "</td>" +
+          "<td align='center'>" + productP + "</td>" +
+          "<td align='center'>" + productS + "</td>" +
+          "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
+          "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+          "</tr>";
+
+        }
+        $("#productsTable").append(tr_str);
       }
+      var tableEnd = "</tbody>";
+      $("#productsTable").append(tableEnd);
 
 
     }
@@ -141,9 +186,9 @@ $(document).on('click', '.deleteProduct', function (e) {
         $('#delete_p_id').val(p_id);
 
         if (response.product.Stock == 0) {
-          document.getElementById("delete_product_btn").disabled = true;
-        } else {
           document.getElementById("delete_product_btn").disabled = false;
+        } else {
+          document.getElementById("delete_product_btn").disabled = true;
         }
       }
     }
@@ -164,10 +209,6 @@ $(document).on('click', '.delete_product_btn', function (e) {
     type: "DELETE",
     url: "products/delete-product/" + p_id,
     success: function (response) {
-      $('#pizza_message').addClass('alert alert-info');
-      $('#pizza_message').text(response.message);
-      $('#deleteModal').modal('hide');
-
       Swal.fire(
         'Success!',
         response.message,
@@ -212,10 +253,9 @@ $(document).on('click', '.update_product', function (e) {
   var data = {
     'ProductName': $('#edit_productName').val(),
     'Price': $('#edit_price').val(),
+    'Category': $('#edit_category').val(),
     'Stock': $('#edit_stock').val(),
   }
-  console.log(p_id);
-  console.log(data);
 
   $.ajaxSetup({
     headers: {
@@ -229,24 +269,15 @@ $(document).on('click', '.update_product', function (e) {
     data: data,
     dataType: "json",
     success: function (response) {
+
       if (response.status == 400) {
         $('#updateform_errList').html("");
         $('#updateform_errList').addClass('alert alert-danger');
         $.each(response.errors, function (key, err_values) {
-          $('updateform_errList').append('<li>' + err_values + '</li>');
+          $('#updateform_errList').append('<li>' + err_values + '</li>');
         });
-
-      } else if (response.status == 404) {
-        $('#updateform_errList').html("");
-        $('#pizza_message').addClass('alert alert-info');
-        $('#pizza_message').text(response.message);
-
       } else {
         $('#updateform_errList').html("");
-        $('#pizza_message').html("");
-        $('#pizza_message').addClass('alert alert-info');
-        $('#pizza_message').text(response.message);
-
         $('#editModal').modal('hide');
 
         Swal.fire(
@@ -254,7 +285,7 @@ $(document).on('click', '.update_product', function (e) {
           response.message,
           'success'
         ).then(function(){
-          window.location = window.location;
+          
         });
       }
     }

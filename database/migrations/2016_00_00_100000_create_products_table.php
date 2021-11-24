@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('ProductName', 50);
             $table->string('Category', 50);
             $table->double('Price', 8, 2)->nullable();
-            $table->double('Stock', 8, 2);
+            $table->double('Stock', 8, 2)->nullable();
             $table->timestamps();
         });
     }

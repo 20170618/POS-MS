@@ -11644,6 +11644,10 @@ table,
   border-color: #f2b560;
 }
 
+.table-gray {
+  --bs-table-bg: #adacad;
+}
+
 input[type="date"]:before {
   font-family: "Font Awesome ";
   color: rgba(0, 0, 0, 0);
