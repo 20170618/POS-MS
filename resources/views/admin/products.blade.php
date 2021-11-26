@@ -17,10 +17,10 @@
             <button type="button" class="btn btn-blue btn-lg view_product" value="Non-Consumable" id="view_product">Non-Consumable</button>
         </div>
         <div class="d-inline-block">
-            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Regular" id="view_product">E-Load Regular</button>
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-Load Regular" id="view_product">E-Load Regular</button>
         </div>
         <div class="d-inline-block">
-            <button type="button" class="btn btn-blue btn-lg view_product" value="E-load Promo" id="view_product">E-Load Promo</button>
+            <button type="button" class="btn btn-blue btn-lg view_product" value="E-Load Promo" id="view_product">E-Load Promo</button>
         </div>
 
         <hr>
@@ -42,7 +42,7 @@
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
-                    <th scope="col">Stock</th>
+                    <th scope="col">Stock/Load Wallet</th>
                     <th scope="col">Category</th>
                     <th scope="col">Actions</th>
                 </tr>

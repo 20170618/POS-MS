@@ -23,7 +23,7 @@ $(document).on('click', '.add_product', function (e) {
     'Price': $('#prodPrice').val(),
     'Category': $('#prodCategory').val(),
     'Stock': $('#prodStock').val(),
-    'Description': $('#prodDescription').val(),
+    'Operator': $('#prodOperator').val(),
   }
   console.log(data);
   $.ajaxSetup({
@@ -79,16 +79,34 @@ $(document).on('click', '.view_product', function (e) {
     url: "products/view-products/" + c_id,
     success: function (data) {
       var len = data.products.length;
-      console.log(data.category);
 
-      var tableHeader = "<thead style='text-align: center'>\
-      <tr class='table-yellow'>\
-          <th scope='col'>Name</th>\
-          <th scope='col'>Price</th>\
-          <th scope='col'>Stock</th>\
-          <th scope='col'>Actions</th>\
-      </tr>\
-      </thead>";
+      if (data.category == "E-Load Regular") {
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Load Wallet</th>\
+        </tr>\
+        </thead>";
+      } else if (data.category == "E-Load Promo"){
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Price</th>\
+            <th scope='col'>Load Wallet</th>\
+            <th scope='col'>Actions</th>\
+        </tr>\
+        </thead>";
+      }else{
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Price</th>\
+            <th scope='col'>Stock</th>\
+            <th scope='col'>Actions</th>\
+        </tr>\
+        </thead>";
+      }
+      
 
       $("#productsTable").append(tableHeader);
 
@@ -102,23 +120,56 @@ $(document).on('click', '.view_product', function (e) {
         var productP = data.products[i].Price;
         var productS = data.products[i].Stock;
         if (productS <= 5) {
-          var tr_str = 
-          "<tr style='text-align: center' class='table-yellow'>" +
-          "<td align='center'>" + productN + "</td>" +
-          "<td align='center'>" + productP + "</td>" +
-          "<td align='center'>" + productS + "</td>" +
-          "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
-          "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
-          "</tr>";
-
+          if (data.category == "E-Load Regular") {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "</tr>";
+          } else if (data.category == "E-Load Promot") {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
+            "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+            "</tr>";
+          } else {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369;" + productP + "</td>" +
+            "<td align='center'>" + productS + "</td>" +
+            "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
+            "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+            "</tr>";
+          }
         } else {
-          var tr_str = "<tr style='text-align: center'>" +
-          "<td align='center'>" + productN + "</td>" +
-          "<td align='center'>" + productP + "</td>" +
-          "<td align='center'>" + productS + "</td>" +
-          "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
-          "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
-          "</tr>";
+          if (data.category == "E-Load Regular"){
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "</tr>";
+
+          }else if (data.category == "E-Load Promo"){
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
+            "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+            "</tr>";
+          }else{
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>" + productS + "</td>" +
+            "<td><button class='btn btn-info editProduct' value="+ id +" style='margin-right:2%'><i class='fas fa-pen'></i></button>"+
+            "<button class='btn btn-danger deleteProduct' value="+ id +"><i class='fas fa-trash'></i></button></td> " +
+            "</tr>";
+          }
+          
 
         }
         $("#productsTable").append(tr_str);
@@ -185,7 +236,15 @@ $(document).on('click', '.deleteProduct', function (e) {
         $('#delete_stock').val(response.product.Stock);
         $('#delete_p_id').val(p_id);
 
-        if (response.product.Stock == 0) {
+        if (response.product.Category == "E-Load Promo") {
+          document.getElementById('deleteSmall').hidden = true;
+          document.getElementById('deleteLabel').innerHTML = "Load Wallet";
+        } else {
+          document.getElementById('deleteSmall').hidden = false;
+          document.getElementById('deleteLabel').innerHTML = "Product Stock";
+        }
+
+        if (response.product.Stock == 0 || response.product.Category == "E-Load Promo") {
           document.getElementById("delete_product_btn").disabled = false;
         } else {
           document.getElementById("delete_product_btn").disabled = true;
@@ -236,11 +295,23 @@ $(document).on('click', '.editProduct', function (e) {
         $('#pizza_message').addClass('alert alert-danger');
         $('#pizza_message').text(response.message);
       } else {
-        $('#edit_productName').val(response.product.ProductName);
-        $('#edit_price').val(response.product.Price);
-        $('#edit_stock').val(response.product.Stock);
-        $('#edit_category').val(response.product.Category);
-        $('#edit_p_id').val(p_id);
+        if (response.product.Category == "E-Load Promo") {
+          $('#edit_productName').val(response.product.ProductName);
+          $('#edit_price').val(response.product.Price);
+          document.getElementById('stockLabel').innerHTML = "Load Wallet";
+          document.getElementById('edit_stock').disabled = true;
+          $('#edit_stock').val(response.product.Stock);
+          $('#edit_category').val(response.product.Category);
+          $('#edit_p_id').val(p_id);  
+        } else {
+          $('#edit_productName').val(response.product.ProductName);
+          $('#edit_price').val(response.product.Price);
+          document.getElementById('stockLabel').innerHTML = "Product Stock";
+          document.getElementById('edit_stock').disabled = false;
+          $('#edit_stock').val(response.product.Stock);
+          $('#edit_category').val(response.product.Category);
+          $('#edit_p_id').val(p_id);
+        }
       }
     }
   });

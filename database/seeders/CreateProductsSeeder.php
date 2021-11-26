@@ -212,21 +212,21 @@ class CreateProductsSeeder extends Seeder
                 'ProductName' => 'SMART AT10',
                 'Category' => 'E-Load Promo', //CategoryID
                 'Price' => '15',
-                'Stock' => '50',
+                'Stock' => '25000',
                
             ],
             [
                 'ProductName' => 'TNT UTP15',
                 'Category' => 'E-Load Promo', //CategoryID
                 'Price' => '20',
-                'Stock' => '50',
+                'Stock' => '25000',
                
             ],
             [
                 'ProductName' => 'SMART UCT25',
                 'Category' => 'E-Load Promo', //CategoryID
                 'Price' => '30',
-                'Stock' => '50',
+                'Stock' => '25000',
                 
             ],
             [

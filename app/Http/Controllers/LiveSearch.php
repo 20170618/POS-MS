@@ -40,16 +40,28 @@ class LiveSearch extends Controller
       {
        foreach($data as $row)
        {
-        $output .= '
-        <tr>
-         <td>'.$row->ProductName.'</td>
-         <td>&#8369; '.number_format($row->Price, 2).'</td>
-         <td>'.$row->Stock.'</td>
-         <td>'.$row->Category.'</td>
-         <td><button class="btn btn-info editProduct" value="'.$row->ProductID.'" style="margin-right:2%"><i class="fas fa-pen"></i></button><button class="btn btn-danger deleteProduct" value="'.$row->ProductID.'"><i class="fas fa-trash"></i></button></td>
+         if ($row->Category == "E-Load Regular") {
+          $output .= '
+          <tr>
+            <td>'.$row->ProductName.'</td>
+            <td> </td>
+            <td>'.$row->Stock.'</td>
+            <td>'.$row->Category.'</td>
+            <td></td>
 
-        </tr>
-        ';
+          </tr>';
+         }else{
+          $output .= '
+            <tr>
+              <td>'.$row->ProductName.'</td>
+              <td>&#8369; '.number_format($row->Price, 2).'</td>
+              <td>'.$row->Stock.'</td>
+              <td>'.$row->Category.'</td>
+              <td><button class="btn btn-info editProduct" value="'.$row->ProductID.'" style="margin-right:2%"><i class="fas fa-pen"></i></button><button class="btn btn-danger deleteProduct" value="'.$row->ProductID.'"><i class="fas fa-trash"></i></button></td>
+
+            </tr>';
+         }
+        
        }
       }
       else

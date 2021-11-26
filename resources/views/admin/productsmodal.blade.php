@@ -14,7 +14,7 @@
                     <label class="form-label mt-4">Product Name</label>
 
                         <input type="text" class="form-control" placeholder="Product Name" name="prodName" id="prodName"> 
-                    <small id="productHelp" class="form-text text-muted">Must contain product unit in name.</small>
+                    <small id="productHelp" class="form-text text-muted">Product unit in name is recommended.</small>
                 </div>
 
                 <div class="form-group">
@@ -43,9 +43,9 @@
                 <div class="form-group" id="POperator" hidden>
                     <label for="prodOperator" class="form-label mt-3">E-Load Operator</label>
                     <select class="form-select" id="prodOperator" name="prodOperator">
-                        <option value="1" id="1">SMART/TNT</option>
-                        <option value="2" id="2">GLOBE/TM</option>
-                        <option value="3" id="3">SUN</option>
+                        <option value="SMART/TNT" id="1">SMART/TNT</option>
+                        <option value="GLOBE/TM" id="2">GLOBE/TM</option>
+                        <option value="SUN" id="3">SUN</option>
                     </select>
                 </div>
             </div> 
@@ -133,12 +133,12 @@
                 </div>
                 
                 
-                <small>Stock must be 0 for product to be deleted.</small>
+                <small id="deleteSmall">Stock must be 0 for product to be deleted.</small>
                 
                 <br>
 
                 <div class="form-group">
-                    <label for="delete_price" class="col-sm-2 col-form-label">Stock</label>
+                    <label for="delete_price" class="col-sm-2 col-form-label" id="deleteLabel">Stock</label>
                     <input type="number" name="delete_stock" id="delete_stock" value="" disabled>
                  </div>
                 
@@ -179,7 +179,7 @@
          
                 <input type="text" class="form-control" placeholder="Enter Product Name" id="edit_productName">
                 
-                <small id="productHelp" class="form-text text-muted">Must contain product unit in name.</small>
+                <small id="productHelp" class="form-text text-muted">Product unit in name is recommended.</small>
                 </div>
 
                 <div class="form-group">
@@ -195,8 +195,8 @@
                 <input type="number" class="form-control" placeholder="0.00" id="edit_price" min="1">
                 </div>
 
-                <div class="form-group">
-                <label class="form-label">Product Stock</label>
+                <div class="form-group" id="stockDiv">
+                <label class="form-label" id="stockLabel">Product Stock</label>
                 <div class="input-group mb-3">
                 <input type="number" class="form-control" placeholder="0" id="edit_stock" min="1">
                 </div>

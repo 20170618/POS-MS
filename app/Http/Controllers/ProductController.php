@@ -56,12 +56,22 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //
-        $validator = Validator::make($request->all(), [
-            'ProductName' =>['required', 'max:50', 'unique:product,ProductName','regex:/^[a-zA-Z0-9 ()]+$/'] ,
-            'Price' =>['required', 'min:1', 'not_in:0'],
-            'Category' =>'required',
-            'Stock' => ['required', 'min:0', 'numeric'],
-        ]);
+        if ($request->input('Category') == "E-Load Promo") {
+            $validator = Validator::make($request->all(), [
+                'ProductName' =>['required', 'max:50', 'unique:product,ProductName','regex:/^[a-zA-Z0-9 ()]+$/'] ,
+                'Price' =>['required', 'min:1', 'not_in:0'],
+                'Category' =>'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'ProductName' =>['required', 'max:50', 'unique:product,ProductName','regex:/^[a-zA-Z0-9 ()]+$/'] ,
+                'Price' =>['required', 'min:1', 'not_in:0'],
+                'Category' =>'required',
+                'Stock' => ['required', 'min:0', 'numeric'],
+            ]);
+        }
+        
+        
 
         if($validator->fails()){
             return response()->json([
@@ -70,16 +80,36 @@ class ProductController extends Controller
                 'error'=>'Please fill all fields'
             ]);
         }else{
-            $product = new Product;
-            $product->ProductName = $request->input('ProductName');
-            $product->Price = $request->input('Price');
-            $product->Category = $request->input('Category');
-            $product->Stock = $request->input('Stock');
-            $product->save();
-            return response()->json([
+            $operator = $request->input('Operator');
+            if ($request->input('Category') == "E-Load Promo") {
+                $eLoadWallet = Product::where('ProductName', 'LIKE', '%'.$operator.'%')
+                ->where('Category', 'LIKE', '%E-Load%')
+                ->first();
+                $loadWallet = $eLoadWallet->Stock;
+
+                $product = new Product;
+                $product->ProductName = $request->input('ProductName');
+                $product->Price = $request->input('Price');
+                $product->Category = $request->input('Category');
+                $product->Stock = $loadWallet;
+                $product->save();
+                return response()->json([
+                    'status'=>200,
+                    'message'=>'Product Added Successfully'
+                ]);
+            } else {
+                $product = new Product;
+                $product->ProductName = $request->input('ProductName');
+                $product->Price = $request->input('Price');
+                $product->Category = $request->input('Category');
+                $product->Stock = $request->input('Stock');
+                $product->save();
+                return response()->json([
                 'status'=>200,
                 'message'=>'Product Added Successfully'
-            ]);
+                ]);
+            }
+                        
         }
     }
 
