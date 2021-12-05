@@ -8,5 +8,5 @@ class SalesDetails extends Model
 {    
     
     protected $table = 'salesdetails';
-    protected $fillable = ['SalesID','ProductID','Quantity','LoadAmount'];
+    protected $fillable = ['SalesID','ProductID','Quantity'];
 }

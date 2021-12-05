@@ -61,6 +61,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
 
     Route::get('profile', [HomeController::class, 'adminProfile'])->name('admin.profile');
     Route::put('profile/update-user/{id}', [UserController::class, 'update']);
+    Route::get('profile/oldPasswordCheck/{id}', [HomeController::class, 'adminOldPassword'])->name('admin.oldPasswordCheck');
 
     Route::get('categories', [HomeController::class, 'categoriesView'])->name('admin.categories');
     Route::post('store-category', [HomeController::class, 'categoryStore']);
@@ -96,6 +97,8 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::put('eload/storeEload', [HomeController::class, 'storeEload'])->name('admin.storeEload');
     Route::put('eload/filter', [HomeController::class, 'filterPromos'])->name('admin.filterPromos');
     Route::get('eload/getPromoPrice/{id}', [HomeController::class, 'getPromoPrice'])->name('admin.getPromoPrice');
+    Route::get('fetch-loadwallet',[HomeController::class,'fetchLoadWallet']);
+    Route::put('refill/{operator}',[HomeController::class,'refillLoadWallet']); 
 
     Route::get('searchUnderCategory', [HomeController::class, 'action']);
 
@@ -111,8 +114,9 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::put('userManagement/archive-user/{id}', [UserController::class, 'archiveUser']);
 
     Route::get('reports', [HomeController::class, 'adminReports'])->name('admin.reports');
-    Route::get('reports/generate',[HomeController::class, 'adminGenerateReport']);
-    Route::get('/reports/generate2',[HomeController::class, 'adminGenerateReport2']);
+    Route::get('reports/preview',[HomeController::class, 'reportPreview'])->name('admin.reportPreview');
+    Route::get('reports/generate',[HomeController::class, 'adminGenerateReport'])->name('admin.reportGenerate');
+    Route::get('/reports/generate2',[HomeController::class, 'adminGenerateReport2'])->name('admin.reportGenerate2');
 
     // Route::get('/admin/PDF',[HomeController::class,'createPDF']);
 

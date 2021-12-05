@@ -42,9 +42,23 @@
 
                                                 @if (Auth::user()->UserID != $active->UserID)
                                                 <button class="btn btn-danger archive_user" value={{$active->UserID}} type="button"><i class="fas fa-archive"></i></button>
+                                                <button type="button"
+                                                        class="btn btn-primary" 
+                                                        role="button" 
+                                                        data-html="true" 
+                                                        data-toggle="popover" 
+                                                        data-trigger="focus" 
+                                                        title="{{$active->FirstName}} {{$active->LastName}}" 
+                                                        data-bs-content=
+                                                        "<div><b>Contact #:</b><br>{{$active->ContactNo}}</div><br>
+                                                        <div><b>Emergency Contact #:</b><br>{{$active->EmContactNo}}</div><br>
+                                                        <div><b>E-Mail Address:</b><br>{{$active->email}}</div>">
+                                                        <i class="fas fa-eye"></i>
+                                                </button>
                                                 @endif
-
+                                               
                                             </td>
+
                                         </tr>
                                     @endforeach
 
@@ -81,6 +95,7 @@
                                     <tr class="table-yellow">
                                         <th scope="col">Name</th>
                                         <th scope="col">Type</th>
+                                        <th scope="col">Action</th>
 
                                     </tr>
                                     </thead>
@@ -90,6 +105,20 @@
                                         <tr class="table-light">
                                             <th scope="row">{{$restricted->FirstName}} {{$restricted->LastName}}</th>
                                             <td>{{$restricted->UserType}}</td>
+                                            <td><button type="button"
+                                                class="btn btn-primary" 
+                                                role="button" 
+                                                data-html="true" 
+                                                data-toggle="popover" 
+                                                data-trigger="focus" 
+                                                title="{{$restricted->FirstName}} {{$restricted->LastName}}" 
+                                                data-bs-content=
+                                                "<div><b>Contact #:</b><br>{{$restricted->ContactNo}}</div><br>
+                                                <div><b>Emergency Contact #:</b><br>{{$restricted->EmContactNo}}</div><br>
+                                                <div><b>E-Mail Address:</b><br>{{$restricted->email}}</div>">
+                                                <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
 
                                         </tr>
                                     @endforeach
@@ -116,4 +145,9 @@
     </div>
 @extends('admin.usersmodals')
     <script src="../../js/users.js"></script>
+    <script>
+        $(document).ready(function(){
+         $('[data-toggle="popover"]').popover({html: true});   
+        });
+    </script>
 @endsection

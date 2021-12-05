@@ -30,7 +30,11 @@
                     <div class="container">
  
                         <div class="row" style="text-align: center" id="customDateDiv">
-                            <h5 class="yellow">Custom Date</h5>
+
+                            <form method="POST" action="{{route('admin.reportGenerate')}}">
+                                @csrf
+                                @method('GET')
+
                             <div class="col">
 
                                 <div class="row">
@@ -40,7 +44,7 @@
                                             <div class="input-group mb-3">
                                                 <input type="date" class="form-control" placeholder="Date"
                                                     aria-label="Recipient's username" aria-describedby="button-addon2"
-                                                    id="startDate" required>
+                                                    id="startDate" name="startDate" required>
                                                 <!--<button class="btn btn-yellow" type="button" id="button-addon2"><i class="fas fa-calendar-alt fa-lg"></i></button>-->
                                             </div>
                                         </div>
@@ -56,7 +60,7 @@
                                             <div class="input-group mb-3">
                                                 <input type="date" class="form-control" placeholder="Date"
                                                     aria-label="Recipient's username" aria-describedby="button-addon2"
-                                                    id="endDate" required>
+                                                    id="endDate" name="endDate" required>
                                                 {{-- <button class="btn btn-yellow" type="button" id="button-addon2"><i class="fas fa-calendar-alt fa-lg"></i></button> --}}
                                             </div>
                                         </div>
@@ -76,10 +80,9 @@
 
                                 <div class="col">
                                     <h6 style="text-align: center">Category</h6>
-
+                                    
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck"
-                                            id="allCheck" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="allCheck" id="allCheck" name="Category[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             All
                                         </label>
@@ -88,48 +91,25 @@
                                     <hr>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="consumable"
-                                            id="consumable" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="Consumable" id="consumable" name="Category[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Consumable
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="nonComsuble"
-                                            id="nonComsuble" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="Non-Consumable" id="nonConsumable" name="Category[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Non-Consumable
                                         </label>
-                                    </div>
+                                   </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="eLoadRegular"
-                                            id="eLoadRegular" name="Category">
+                                        <input class="form-check-input allCheck" type="checkbox" value="E-Load" id="eLoadRegular" name="Category[]">
                                         <label class="form-check-label" for="flexCheckDefault">
-                                            E-Load Regular
+                                            E-Load
                                         </label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="eLoadPromo"
-                                            id="eLoadPromo" name="Category">
-                                        <label class="form-check-label" for="flexCheckDefault">
-                                            E-Load Promo
-                                        </label>
-                                    </div>
-
-                                    <!-- <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="debts"
-                                            id="debts" name="Category">
-                                        <label class="form-check-label" for="flexCheckDefault">
-                                           Debts
-                                        </label>
-                                    </div> -->
-
-                                    
-
-                                
+                                    </div>                      
                                     </fieldset>
 
 
@@ -140,8 +120,8 @@
                                     <h6 style="text-align: center">Mode of Payment</h6>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="allCheckPayment"
-                                            id="allCheckPayment" name="modeOfPayment">
+                                        <input class="form-check-input allCheck2" type="checkbox" value="allCheck2"
+                                            id="allCheck2" name="modeOfPayment[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             All
                                         </label>
@@ -150,16 +130,16 @@
                                     <hr>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="cash"
-                                            id="Cash" name="modeOfPayment">
+                                        <input class="form-check-input allCheck2" type="checkbox" value="Cash"
+                                            id="cash" name="modeOfPayment[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Cash
                                         </label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input allCheck" type="checkbox" value="credit"
-                                            id="credit" name="modeOfPayment">
+                                        <input class="form-check-input allCheck2" type="checkbox" value="Credit"
+                                            id="credit" name="modeOfPayment[]">
                                         <label class="form-check-label" for="flexCheckDefault">
                                             Credit
                                         </label>
@@ -172,26 +152,7 @@
 
 
 
-                                </div>
-
-
-                                <div class="col">
-                                    <h6 style="text-align: center">Salesperson</h6>
-
-                                    <fieldset class="form-group">
-                                        <div class="form-group">
-                                            <select class="form-select" id="exampleSelect1">
-                                                <option>Any</option>
-                                                @foreach ($salespersons as $salesperson)
-                                                    <option>{{ $salesperson->FirstName }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </fieldset>
-                                </div>
-
-                              
-
+                                </div>                         
 
                             </div>
                         </div>
@@ -202,11 +163,13 @@
 
             </div>
             <div class="card-footer" style="text-align: right">
-            <a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>
+            <button class="btn btn-yellow" id="GenerateButton" type="submit">Generate</button>
+            <!--<a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>-->
           
             </div>
 
-            <!-- <button class="btn btn-yellow" id="GenerateButton">Generate 2</button> -->
+            
+        </form>
         </div>
 
 
@@ -221,9 +184,9 @@
         $(document).ready(function() {
 
             //Check box for Category
-            $('input[type=checkbox][name=Category]').change(function() {
+            $('input[type=checkbox][class=Category]').change(function() {
                 if (this.value == 'allCheck') {
-                    var checkboxes = document.querySelectorAll('input[type="checkbox"][name=Category]');
+                    var checkboxes = document.querySelectorAll('input[type="checkbox"][class=Category]');
                     for (var checkbox of checkboxes) {
                         checkbox.checked = this.checked;
                     }
@@ -233,13 +196,74 @@
                 }
             });
 
+            $('#allCheck').change(function(){
+                if (document.getElementById('allCheck').checked) {
+                    document.getElementById('consumable').checked = false;
+                    document.getElementById('consumable').disabled = true;
+
+                    document.getElementById('nonConsumable').checked = false;
+                    document.getElementById('nonConsumable').disabled = true;
+
+                    document.getElementById('eLoadRegular').checked = false;
+                    document.getElementById('eLoadRegular').disabled = true;
+
+                    document.getElementById('eLoadPromo').checked = false;
+                    document.getElementById('eLoadPromo').disabled = true;
+                }else{
+                    document.getElementById('consumable').checked = false;
+                    document.getElementById('consumable').disabled = false;
+
+                    document.getElementById('nonConsumable').checked = false;
+                    document.getElementById('nonConsumable').disabled = false;
+
+                    document.getElementById('eLoadRegular').checked = false;
+                    document.getElementById('eLoadRegular').disabled = false;
+
+                    document.getElementById('eLoadPromo').checked = false;
+                    document.getElementById('eLoadPromo').disabled = false;
+                }
+            });
+
+            $('#allCheck2').change(function(){
+                if (document.getElementById('allCheck2').checked){
+                    document.getElementById('cash').checked = false;
+                    document.getElementById('cash').disabled = true;
+
+                    document.getElementById('credit').checked = false;
+                    document.getElementById('credit').disabled = true;
+                }else{
+                    document.getElementById('cash').checked = false;
+                    document.getElementById('cash').disabled = false;
+
+                    document.getElementById('credit').checked = false;
+                    document.getElementById('credit').disabled = false;
+                }
+            })
+
+            //Check box for Category
+            $('input[type=checkbox][name=modeOfPayment]').change(function() {
+                if (this.value == 'allCheck2') {
+                    var checkboxes = document.querySelectorAll('input[type="checkbox"][name=modeOfPayment]');
+                    for (var checkbox of checkboxes) {
+                        checkbox.checked = this.checked;
+                    }
+
+                } else {
+                    document.getElementById("allCheck2").checked = false;
+                }
+            });
+
             //Generate Report Button on Click
+            /*
             $('#GenerateButton').click(function(e) {
                 e.preventDefault();
                 var startDate = document.getElementById("startDate").value;
                 var endDate = document.getElementById("endDate").value;
-
-                console.log(startDate+" "+endDate);
+                var data = {
+                    'startDate': startDate,
+                    'endDate': endDate
+                }
+                console.log(data);
 
                $.ajaxSetup({
                     headers: {
@@ -247,24 +271,18 @@
                     }
                 });
 
-                var data = {
-                    'startDate': startDate,
-                    'endDate': endDate
-                }
-                console.log(data);
-
                 $.ajax({
                     type: "GET",
-                    url: "/admin/reports/generate2",
+                    url: "reports/preview",
                     data: data,
                     dataType: "json",
                     success: function(response) {
-                        window.location.href = "/admin/reports/generate2";
+                        console.log("works");
                     }
                     
                 });
-                window.location.href = "/admin/reports/generate2";
             });
+            */
 
             //Time limiter for End Date Input
             var today = new Date();

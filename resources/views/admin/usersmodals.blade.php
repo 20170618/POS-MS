@@ -15,9 +15,6 @@
                     You're about to archive this user:
                 </p>
 
-                <label for="archive_UserName" class="col col-form-label">Username</label>
-                <input type="text" name="archive_UserName" id="archive_UserName" value="" disabled>
-                <br>
                 <label for="archive_FirstName" class="col col-form-label">First Name</label>
                 <input type="text" name="archive_FirstName" id="archive_FirstName" value="" disabled>
                 <br>

@@ -35,12 +35,6 @@ class CreateProductsSeeder extends Seeder
                 'Stock' => '25000',
             ],
             [
-                'ProductName' => 'Sun Regular Load',
-                'Category' => 'E-Load Regular', //CategoryID
-                'Price' => null,
-                'Stock' => '25000',
-            ],
-            [
                 'ProductName' => 'Porkchop Loin 1KG',
                 'Category' => 'Consumable', //CategoryID
                 'Price' => '90',

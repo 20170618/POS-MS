@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\ELoad;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use App;
 use Redirect,Response;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +89,44 @@ class HomeController extends Controller
         return view('salesperson.salespersonaddtransaction');
     }
 
+    public function fetchLoadWallet()
+    {
+        $smart = DB::table('product')->select('Stock')->where('ProductName','LIKE','%SMART%')->first();
+        $globe = DB::table('product')->select('Stock')->where('ProductName','LIKE','%GLOBE%')->first();
+
+        return response()->json([
+            'smart'=> $smart,
+            'globe'=>$globe,
+        ]);
+    }
+
+    public function refillLoadWallet(Request $request, $operator)
+    {
+        if($operator=='SMART'){
+            $old =  DB::table('product')->select('Stock')->where('ProductName','LIKE','%SMART%')->first();
+            $newval = floatval($request->input('loadval'));
+            $new = $old->Stock + $newval;
+            Product::where('ProductName', 'LIKE', '%SMART%')->update(['Stock' => $new]);
+            Product::where('ProductName', 'LIKE', '%TNT%')->update(['Stock' => $new]);
+
+            return response()->json([
+                'status' => 'Success',
+                'message' => 'Load has been successfully restocked.'
+            ]);
+        }else if($operator=='GLOBE'){
+            $old =  DB::table('product')->select('Stock')->where('ProductName','LIKE','%GLOBE%')->first();
+            $newval = floatval($request->input('loadval'));
+            $new = $old->Stock + $newval;
+            Product::where('ProductName', 'LIKE', '%GLOBE%')->update(['Stock' => $new]);
+            Product::where('ProductName', 'LIKE', '%TM%')->update(['Stock' => $new]);
+
+            return response()->json([
+                'status' => 'Success',
+                'message' => 'Load has been successfully restocked.'
+            ]);
+        }
+    }
+
     /**
      * Show the application dashboard.
      *
@@ -101,6 +140,39 @@ class HomeController extends Controller
     public function adminProfile()
     {
         return view('admin.profile');
+    }
+
+    public function adminOldPassword($id, Request $request){
+        
+        $validator = Validator::make($request->all(), [
+            'password'=> 'required|string|min:6|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status'=>2002021,
+            ]);
+        }else{
+            $user = DB::table('users')->select('users.*')->where('UserID','=',$id)->first();
+            $pass = $user->password;
+            $toHash = $request->input('password');
+            $old = $request->input('oldPassword');
+            
+            if(password_verify($old, $pass)){
+                $userAcc = User::find($id);
+                $userAcc->password = Hash::make($toHash);
+                $userAcc->update();
+                return response()->json([
+                    'status'=>200,
+                ]);
+            }else{
+                return response()->json([
+                'status'=>212121,
+                ]);
+            }
+        }
+        
+        
     }
 
     public function adminProducts()
@@ -148,7 +220,11 @@ class HomeController extends Controller
             ->where('ProductName', 'NOT LIKE', '%Regular%')
             ->where('Category', '=', 'E-Load Promo')
             ->get();
-        return view('admin.eload', compact('sales', 'regular','promos'));
+        $eloads = DB::table('eloads')
+            ->join('product','eloads.ProductID','=','product.ProductID')
+            ->select('eloads.*','product.ProductName',)
+            ->get();
+        return view('admin.eload', compact('sales', 'regular','promos','eloads'));
     }
 
     public function salesPersonEload()
@@ -281,6 +357,43 @@ class HomeController extends Controller
     }
 
     public function storeEload(Request $request){
+
+        
+        $operator = $request->input('Operator');
+        $verpro = $request->input('isPromo');
+        $promoDetail = DB::table('product')->select()->where('ProductID','=',($request->input('ProductID')))->first();
+
+        if($verpro == 1){
+            $contains = str_contains(strval($promoDetail->ProductName), 'SMART');
+            $containsB = str_contains(strval($promoDetail->ProductName), 'TNT');
+            $contains2 = str_contains(strval($promoDetail->ProductName), 'GLOBE');
+            $contains2B = str_contains(strval($promoDetail->ProductName), 'TM');
+            if($contains || $containsB){
+                $operator="SMART";
+            }else if($contains2 || $contains2B){
+                $operator="GLOBE";
+            }
+        }
+        
+        if($operator=="SMART"){
+            $smart = DB::table('product')->select('Stock')->where('ProductName','LIKE','%SMART%')->first();
+            $oldval = floatval($smart->Stock);
+            $newval = floatval($request->input('LoadAmount'));
+            $new = $oldval - $newval;
+
+            Product::where('ProductName', 'LIKE', '%SMART%')->update(['Stock' => $new]);
+            Product::where('ProductName', 'LIKE', '%TNT%')->update(['Stock' => $new]);
+            
+        }else if($operator=="GLOBE"){
+            $globe = DB::table('product')->select('Stock')->where('ProductName','LIKE','%GLOBE%')->first();
+            $oldval = floatval($globe->Stock);
+            $newval = floatval($request->input('LoadAmount'));
+            $new = $oldval - $newval;
+            
+            Product::where('ProductName', 'LIKE', '%GLOBE%')->update(['Stock' => $new]);
+            Product::where('ProductName', 'LIKE', '%TM%')->update(['Stock' => $new]);
+        }
+
         $eLoad = new ELoad;
         $eLoad->ProductID = $request->input('ProductID');
         $eLoad->LoadAmount = $request->input('LoadAmount');
@@ -293,16 +406,16 @@ class HomeController extends Controller
     }
 
     public function getPromoPrice($id){
-        $product = Product::find($id)->get();
-        $price = $product->Price();
+        $product = Product::find($id);
         return response()->json([
             'status'=>200,
-            'price'=>$product,
+            'product'=>$product,
         ]);
     }
 
     public function storeTransaction(Request $request){
         $validator = Validator::make($request->all(), [
+            'PersonInChargeID' =>'required',
             'PersonInCharge' =>'required',
             'ModeOfPayment' =>'required',
         ]);
@@ -314,6 +427,7 @@ class HomeController extends Controller
             ]);
         }else{
             $sales= new Sales;
+            $sales->PersonInChargeID = $request->input('PersonInChargeID');
             $sales->PersonInCharge = $request->input('PersonInCharge');
             $sales->ModeOfPayment = $request->input('ModeOfPayment');
             $sales->save();
@@ -326,7 +440,6 @@ class HomeController extends Controller
                 $salesDetails->SalesID = $id;
                 $salesDetails->ProductID = $data_ID['id'];
                 $salesDetails->Quantity = $data_ID['quantity'];
-                $salesDetails->LoadAmount = $data_ID['quantity'];
                 $salesDetails->save();
 
                 $prod = Product::find($data_ID['id']);
@@ -343,6 +456,7 @@ class HomeController extends Controller
 
     public function storeDebt(Request $request){
         $validator = Validator::make($request->all(), [
+            'PersonInChargeID' =>'required',
             'PersonInCharge' =>'required',
             'ModeOfPayment' =>'required',
             'AmountPaid' =>'required',
@@ -362,6 +476,7 @@ class HomeController extends Controller
                 ]);
             }else{
                 $sales= new Sales;
+                $sales->PersonInChargeID = $request->input('PersonInChargeID');
                 $sales->PersonInCharge = $request->input('PersonInCharge');
                 $sales->ModeOfPayment = 'Credit';
                 $sales->save();
@@ -381,7 +496,6 @@ class HomeController extends Controller
                     $salesDetails->SalesID = $id;
                     $salesDetails->ProductID = $data_ID['id'];
                     $salesDetails->Quantity = $data_ID['quantity'];
-                    $salesDetails->LoadAmount = $data_ID['quantity'];
                     $salesDetails->save();
 
                     $prod = Product::find($data_ID['id']);
@@ -489,18 +603,434 @@ class HomeController extends Controller
         return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
     }
 
-    public function adminGenerateReport(Request $request){
-            $now = Carbon::now();
-            $startDate = $request->input('startDate');
-            $endDate = $request->input('endDate');
+    public function reportPreview(Request $request){
+        $request->validate([
+            'Category' => 'required|min:1',
+            'modeOfPayment' => 'required|min:1'
+        ]);
 
-            $newStartDate = date('Y-m-d', strtotime($startDate));
-            $newEndDate = date('Y-m-d', strtotime($endDate));
+        $now = Carbon::now();
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        $newStartDate = date('Y-m-d', strtotime($startDate)).' 00:00:00';
+        $newEndDate = date('Y-m-d', strtotime($endDate)).' 23:59:59';
+
+        $consumableSales = DB::table('salesdetails')
+            ->join('product','salesdetails.ProductID','=','product.ProductID')
+            ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+            ->where('product.Category','=','Consumable')
+            ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+            ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+            ->get();
+        $nonConsumableSales = DB::table('salesdetails')
+            ->join('product','salesdetails.ProductID','=','product.ProductID')
+            ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+            ->where('product.Category','=','Non-Consumable')
+            ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+            ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+            ->get();
+        $eLoadSales = DB::table('eloads')
+            ->join('product','eloads.ProductID','=','product.ProductID')
+            ->select(DB::raw('eloads.ProductID, SUM(LoadAmount) as sold, product.Category, product.ProductName'))
+            ->where('product.Category','LIKE','%E-Load%')
+            ->whereBetween('eloads.created_at',[$newStartDate, $newEndDate])
+            ->groupBy('eloads.ProductID', 'product.Category', 'product.ProductName')
+            ->get();
+
+        $categories = $request->get('Category');
+
+        $outOfStocks = DB::table('product')
+            ->select()
+            ->where('Stock','<=','5')
+            ->get();
+
+        $sales = DB::table('sales')
+            ->select()
+            ->where('ModeOfPayment','=','Cash')
+            ->whereBetween('created_at',[$newStartDate, $newEndDate])
+            ->count();
+        $debts = DB::table('sales')
+            ->select()
+            ->where('ModeOfPayment','=','Credit')
+            ->whereBetween('created_at',[$newStartDate, $newEndDate])
+            ->count();
+        
+        return route('reportGenerate')
+            ->with('startDate',$newStartDate)
+            ->with('endDate',$newEndDate)
+            ->with('now',$now)
+            ->with('outOfStocks', $outOfStocks)
+            ->with('sales',$sales)
+            ->with('debts',$debts)
+            ->with('consumableSales',$consumableSales)
+            ->with('nonConsumableSales',$nonConsumableSales)
+            ->with('eLoadSales',$eLoadSales)
+            ->with('categories',$categories);
+    }
+
+    public function adminGenerateReport(Request $request){
+        $request->validate([
+            'Category' => 'required|min:1',
+            'modeOfPayment' => 'required|min:1'
+        ]);
+
+        $now = Carbon::now();
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        $newStartDate = date('Y-m-d', strtotime($startDate)).' 00:00:00';
+        $newEndDate = date('Y-m-d', strtotime($endDate)).' 23:59:59';
+
+        $categories = $request->get('Category');
+        $modeOfPayment = $request->get('modeOfPayment');
+
+        if (in_array('Cash', $modeOfPayment) && !in_array('Credit', $modeOfPayment)) {
+            $consumableSales = DB::table('salesdetails')
+                ->join('sales','salesdetails.salesID','=','sales.salesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('sales.ModeOfPayment','=','Cash')
+                ->where('product.Category','=','Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $nonConsumableSales = DB::table('salesdetails')
+                ->join('sales','salesdetails.salesID','=','sales.salesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('sales.ModeOfPayment','=','Cash')
+                ->where('product.Category','=','Non-Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $eLoadSales = DB::table('eloads')
+                ->join('product','eloads.ProductID','=','product.ProductID')
+                ->select(DB::raw('eloads.ProductID, SUM(LoadAmount) as sold, product.Category, product.ProductName'))
+                ->where('product.Category','LIKE','%E-Load%')
+                ->whereBetween('eloads.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('eloads.ProductID', 'product.Category', 'product.ProductName')
+                ->get();
+            $reportType = "Sales Breakdown";
+        } else if (in_array('Credit', $modeOfPayment) && !in_array('Cash', $modeOfPayment)) {
+            $consumableSales = DB::table('salesdetails')
+                ->join('sales','salesdetails.salesID','=','sales.salesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('sales.ModeOfPayment','=','Credit')
+                ->where('product.Category','=','Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $nonConsumableSales = DB::table('salesdetails')
+                ->join('sales','salesdetails.salesID','=','sales.salesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('sales.ModeOfPayment','=','Credit')
+                ->where('product.Category','=','Non-Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $eLoadSales = '[]';
+            $reportType = "Debts Breakdown";
+        }else{
+            $consumableSales = DB::table('salesdetails')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('product.Category','=','Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $nonConsumableSales = DB::table('salesdetails')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select(DB::raw('SUM(Quantity) as sold, salesdetails.ProductID, (product.Price * SUM(Quantity)) as cost, product.Category, product.ProductName'))
+                ->where('product.Category','=','Non-Consumable')
+                ->whereBetween('salesdetails.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('salesdetails.ProductID', 'product.Price', 'product.Category', 'product.ProductName')
+                ->get();
+            $eLoadSales = DB::table('eloads')
+                ->join('product','eloads.ProductID','=','product.ProductID')
+                ->select(DB::raw('eloads.ProductID, SUM(LoadAmount) as sold, product.Category, product.ProductName'))
+                ->where('product.Category','LIKE','%E-Load%')
+                ->whereBetween('eloads.created_at',[$newStartDate, $newEndDate])
+                ->groupBy('eloads.ProductID', 'product.Category', 'product.ProductName')
+                ->get();
+            $reportType = "Sales Breakdown";
+        }
+        
+
+        
+
+        $outOfStocks = DB::table('product')
+            ->select()
+            ->where('Stock','<=','5')
+            ->get();
+
+        $sales = DB::table('sales')
+            ->select()
+            ->where('ModeOfPayment','=','Cash')
+            ->whereBetween('created_at',[$newStartDate, $newEndDate])
+            ->count();
+        $debts = DB::table('sales')
+            ->select()
+            ->where('ModeOfPayment','=','Credit')
+            ->whereBetween('created_at',[$newStartDate, $newEndDate])
+            ->count();
+        
+        // PDF Format
+        $title = "Migui's Store Report";
+        $output = '
+        <head>
+                <style>
+                    .page-break {
+                        page-break-after: always;
+                    }
+
+                    body {
+                        font-family: "Trebuchet MS", sans-serif;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
+
+                    th {
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        text-align: left;
+                        background-color: #343a41;;
+                        color: white;
+                    }
+
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+
+             </style>
+        </head>
+        <body>
+        <div class="row">
+            <h4 style="text-align: center;margin-top: 30%">'.$title.'</h4>
+            <h5 style="text-align: center">Date Created: '.$now.'</h5>
+            <h5 style="text-align: center">Start Date: '.$newStartDate.' End Date: '.$newEndDate.'</h5>
+        </div>
+
+        <div class="page-break"></div>
+
+        <div class="row">
+            <div class="col">
+                <h5>Number of Sales: '.$sales.'</h5>
+            </div>
+            <div class="col">
+                <h5>Number of Debts: '.$debts.'</h5>
+            </div>
+        </div>
+
+
+        <h5 style="text-align: center">'.$reportType.'</h5>
+        ';
+        if (in_array('Consumable', $categories) || in_array('allCheck', $categories)) {
+            $output .='<div>';
+        } else {
+            $output .='<div hidden>';
+        }
+
+        $output.=
+        '<h5>Consumable</h5>
+        <table class="table table-light">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th># Sold</th>
+                    <th>Sale Per Product</th>
+                </tr>
+                
+            </thead>
+            <tbody>'
+        ;
+
+        if ($consumableSales == '[]') {
+            $output .=
+            '<tr>
+                <td colspan="3" style="text-align: center">No Products</td>
+            </tr> ';
+        } else {
+            $totalCon = 0;
+            foreach ($consumableSales as $consumableSale) {
+                $output .=
+                '<tr>
+                    <td>'.$consumableSale->ProductName.'</td>
+                    <td>'.$consumableSale->sold.'</td>
+                    <td>'.$consumableSale->cost.'</td>
+                </tr>'
+                ;
+                $totalCon += $consumableSale->cost;
+            }
+            $output .= 
+            ' <tr>
+                <td colspan="2" style="text-align: right">Total:</td>
+                <td><b>'.$totalCon.'</b></td>
+            </tr>'
+            ;
+        }
+
+        $output .= 
+        '</tbody>
+        </table>
+        </div>
+        '
+        ;
+
+        if (in_array('Non-Consumable', $categories) || in_array('allCheck', $categories)) {
+            $output .='<div>';
+        } else {
+            $output .='<div hidden>';
+        }
+
+        $output.=
+        '<h5>Non-Consumable</h5>
+        <table class="table table-light">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th># Sold</th>
+                    <th>Sale Per Product</th>
+                </tr>
+                
+            </thead>
+            <tbody>'
+        ;
+
+        if ($nonConsumableSales == '[]') {
+            $output .=
+            '<tr>
+                <td colspan="3" style="text-align: center">No Products</td>
+            </tr> ';
+        } else {
+            $totalNCon = 0;
+            foreach ($nonConsumableSales as $nonConsumableSale) {
+                $output .=
+                '<tr>
+                    <td>'.$nonConsumableSale->ProductName.'</td>
+                    <td>'.$nonConsumableSale->sold.'</td>
+                    <td>'.$nonConsumableSale->cost.'</td>
+                </tr>'
+                ;
+                $totalNCon += $nonConsumableSale->cost;
+            }
+            $output .= 
+            ' <tr>
+                <td colspan="2" style="text-align: right">Total:</td>
+                <td><b>'.$totalNCon.'</b></td>
+            </tr>'
+            ;
+        }
+
+        $output .= 
+        '</tbody>
+        </table>
+        </div>
+        '
+        ;
+
+        if (in_array('E-Load', $categories) || in_array('allCheck', $categories)) {
+            $output .='<div>';
+        } else {
+            $output .='<div hidden>';
+        }
+
+        $output.=
+        '<h5>E-Load</h5>
+        <table class="table table-light">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Sale Per Product</th>
+                </tr>
+                
+            </thead>
+            <tbody>'
+        ;
+
+        if ($eLoadSales == '[]') {
+            $output .=
+            '<tr>
+                <td colspan="2" style="text-align: center">No Products</td>
+            </tr> ';
+        } else {
+            $totalELoad = 0;
+            foreach ($eLoadSales as $eLoadSale) {
+                $output .=
+                '<tr>
+                    <td>'.$eLoadSale->ProductName.'</td>
+                    <td>'.$eLoadSale->sold.'</td>
+                </tr>'
+                ;
+                $totalELoad += $eLoadSale->sold;
+            }
+            $output .= 
+            ' <tr>
+                <td colspan="1" style="text-align: right">Total:</td>
+                <td><b>'.$totalELoad.'</b></td>
+            </tr>'
+            ;
+        }
+
+        $output .= 
+        '</tbody>
+        </table>
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <h5 style="text-align: center">Products Out of Stock</h5>
+                            <table class="table table-light">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                     
+                                </thead>
+                                <tbody>'
+        ;
+        
+        if ($outOfStocks == '[]') {
+            $output .=
+            '<tr>
+                <td colspan="3" style="text-align: center">No Products</td>
+             </tr> '
+            ;
+        } else {
+            foreach ($outOfStocks as $outOfStock) {
+                $output .=
+                '<tr>
+                    <td>'.$outOfStock->ProductName.'</td>
+                    <td>'.$outOfStock->Category.'</td>
+                    <td>'.$outOfStock->Stock.'</td>
+                </tr> '
+                ;
+            }
+        }
+
+        $output .=
+        '</tbody>
+        </table>'
+        ;
+
+        $output .='
+        </body>
+        </html>';
+        // End of PDF Format
+
 
             $pdf = App::make('dompdf.wrapper');
-            $pdf->loadHTML($this->convert_order_data_to_html($newStartDate, $newEndDate));
+            $pdf->loadHTML($output);
             $pdf->setPaper('A4', 'landscape');
-            return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
+            return $pdf->download('POS-MS Report '.$now.'.pdf');
     }
 
     function convert_order_data_to_html($sD, $eD)
@@ -779,24 +1309,60 @@ class HomeController extends Controller
         }
     }
 
+    public function showTransactionDetails($id){
+        $details = DB::table('salesdetails')
+                    ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+                    ->join('product','salesdetails.ProductID','=','product.ProductID')
+                    ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName')
+                    ->where('salesID','$id')
+                    ->get();
+
+        return response()->json([
+            'status' => 123,
+            'details' => $details
+        ]);
+    }
+
     public function searchTransactions(Request $request){
         if($request->ajax()){
             $output='';
             $query = $request->get('query');
             if($query != ''){
                 $data = DB::table('sales')
-                    ->join('users','sales.PersonInCharge','=','users.UserID')
+                    ->join('users','sales.PersonInChargeID','=','users.UserID')
                     ->join('credits','sales.SalesID','=','credits.SalesID')
                     ->select('users.FirstName as FirstName','sales.*','BalancePayDate','users.*','sales.created_at as created_at')
-                    ->whereRaw("(BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%'))")
-                    ->orderBy('sales.SalesID', 'desc')
+                    ->whereRaw("credits.BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%')")
+                    ->orderByDesc('sales.SalesID')
                     ->get();
-            }else{
-                $data = DB::table('sales')->join('users','sales.PersonInCharge','=','users.UserID')
-                ->join('credits','sales.SalesID','=','credits.SalesID')
-                ->whereRaw("BalancePayDate", "!=", "NULL")->get();
-            }
 
+                $details = DB::table('salesdetails')
+                    ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+                    ->join('product','salesdetails.ProductID','=','product.ProductID')
+                    ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName')
+                    ->get();
+
+            }else{
+                $credits = DB::table('sales')
+                ->join('users','sales.PersonInChargeID','=','users.UserID')
+                ->join('credits','sales.SalesID','=','credits.SalesID')
+                ->select('sales.*','users.*')
+                ->whereNotNull('credits.BalancePayDate');
+
+                $data = DB::table('sales')
+                ->join('users','sales.PersonInChargeID','=','users.UserID')
+                ->select()
+                ->where('ModeOfPayment','=','Cash')
+                ->union($credits)
+                ->get();
+
+                $details = DB::table('salesdetails')
+                ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName','product.Price as ProductPrice')
+                ->get();
+            }
+            $total = 0;
             $total_row = $data->count();
             if($total_row > 0){
 
@@ -807,20 +1373,31 @@ class HomeController extends Controller
                         <td>'.$row->ModeOfPayment.'</td>
                         <td>'.$row->created_at.'</td>
                         <td>'.$row->FirstName.' '.$row->LastName.'</td>
+                        <td>';
+
+                        foreach ($details as $detail) {
+                            if ($detail->SalesID == $row->SalesID) {
+                                $output .= ''.$detail->ProductName.' x '.$detail->Quantity.'<br>';
+                                $total += ($detail->Quantity * $detail->ProductPrice);
+                            }
+                        }
+
+                    $output .='</td>
+                        <td>'.$total.'</td>
                         <td>
                                 <a href="'.route('admin.transactionDetails', $row->SalesID).'" class="btn btn-primary "><i class="fas fa-eye"></i></a>
                                 <a class="btn btn-primary" href="'.route('admin.editTransaction', $row->SalesID).'"><i class="fas fa-pen"></i></a>
-                                &nbsp;
                                 <button class="btn btn-secondary delete_transaction" value="'.$row->SalesID.'" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-archive"></i></button>
                         </td>
                     </tr>
                     ';
+                    $total = 0;
                     }
 
             }else{
                 $output = '
                 <tr style = "text-align:center;">
-                    <td colspan = "4"> No Data Found! </td>
+                    <td colspan = "6"> No Data Found! </td>
                 </tr>
                 ';
             }

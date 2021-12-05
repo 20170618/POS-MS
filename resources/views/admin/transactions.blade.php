@@ -42,10 +42,12 @@
                 <table class="table table-hover">
                     <thead>
                     <tr style="text-align: center;">
-                        <th scope ="col">Sale ID</th>
+                        <th scope ="col">Sales ID</th>
                         <th scope ="col">Mode of Payment</th>
                         <th scope="col">Date & Time</th>
                         <th scope="col">Person In Charge</th>
+                        <th scope="col">Order Details</th>
+                        <th scope="col">Sales Total</th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
@@ -59,9 +61,8 @@
                             <td>{{$sale->created_at}}</td>
                             <td>{{$sale->FirstName}} {{$sale->LastName}}</td>
                             <td>
-                                <a href="{{ route('admin.transactionDetails', $sale->SalesID) }}" class="btn btn-primary "><i class="fas fa-eye"></i></a>
+                                <button class="btn btn-primary transaction_detail_show" value="{{$sale->SalesID}}"><i class="fas fa-eye"></i></button>
                                 <a class="btn btn-primary" href="{{route('admin.editTransaction', $sale->SalesID)}}"><i class="fas fa-pen"></i></a>
-                                &nbsp;
                                 <button class="btn btn-secondary delete_transaction" value="{{$sale->SalesID}}" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-archive"></i></button>
                             </td>
                         </tr>
@@ -71,6 +72,119 @@
             </div>
         </div>
     </div>
+
+<!-- Start View Sales Details Modal -->
+<div id="transactionDetailModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header blue-bg yellow">
+                    <h5 class="modal-title"><i class="fas fa-list-ul"></i> &nbsp;&nbsp;Sales Details</h5>
+                    <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                    <div class="scrollable">
+
+                        <table class="table table-light">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                    <td>Test</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <style type="text/css">
+                        .scrollable{
+                            height: 15rem;
+                            overflow:hidden;
+                            overflow-y: scroll;
+                        }
+                    </style>
+
+                    <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example"
+                        tabindex="0">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer" style="text-align: right">
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Back</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<!-- End View Sales Details Modal -->
 
 <!-- Start Delete -->
     <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
@@ -111,6 +225,27 @@
 
 
             fetch_data();
+
+            $(document).click('.transaction_detail_show',function (e) { 
+                e.preventDefault();
+
+                var transacID = $(this).val();
+            
+                var data = {
+                    'transacID': transacID,
+                };
+
+                $('#transactionDetailModal').modal('show');
+
+                $.ajax({
+                    type: "GET",
+                    url: "show-transaction-detail/"+ transacID,
+                    success: function (response) {
+                        
+                    }
+                });
+
+            });
 
             //fetch all records
             function fetch_data(query=''){

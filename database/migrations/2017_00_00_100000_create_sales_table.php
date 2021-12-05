@@ -15,11 +15,12 @@ class CreateSalesTable extends Migration
     {
         Schema::create('Sales', function (Blueprint $table) {
             $table->id('SalesID');
-            $table->unsignedBigInteger('PersonInCharge');
+            $table->unsignedBigInteger('PersonInChargeID')->nullable();
+            $table->string('PersonInCharge', 50);
             $table->string('ModeOfPayment', 6);
             $table->timestamps();
 
-            $table->foreign('PersonInCharge')->references('UserID')->on('users');
+            $table->foreign('PersonInChargeID')->references('UserID')->on('users')->nullOnDelete();
         });
     }
 

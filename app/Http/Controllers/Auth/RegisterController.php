@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Artisan;
 
 class RegisterController extends Controller
 {
@@ -86,6 +87,7 @@ class RegisterController extends Controller
                 'EmContactNo'=>$data['emContactNo'],
             ]);
         }else{
+            Artisan::call('db:seed', ['--class' => 'CreateProductsSeeder']);
             return User::create([
                 'FirstName' => $data['firstname'],
                 'LastName' => $data['lastname'],
@@ -95,6 +97,7 @@ class RegisterController extends Controller
                 'ContactNo'=>$data['contactNo'],
                 'EmContactNo'=>$data['emContactNo'],
             ]);
+            
         }
         
     }

@@ -45,7 +45,6 @@
                     <select class="form-select" id="prodOperator" name="prodOperator">
                         <option value="SMART/TNT" id="1">SMART/TNT</option>
                         <option value="GLOBE/TM" id="2">GLOBE/TM</option>
-                        <option value="SUN" id="3">SUN</option>
                     </select>
                 </div>
             </div> 

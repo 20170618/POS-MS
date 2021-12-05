@@ -136,9 +136,9 @@
                     </div>
 
                     <!-- <div class="card-footer" style="text-align: right">
-                            <button class="btn btn-primary" type="button">Cancel</button>
-                            <button  class="btn btn-yellow" type="button" >Add</button>
-                        </div> -->
+                                <button class="btn btn-primary" type="button">Cancel</button>
+                                <button  class="btn btn-yellow" type="button" >Add</button>
+                            </div> -->
 
                 </div>
             </div>
@@ -158,8 +158,10 @@
                                     <div class="form-group row">
                                         <label for="personInCharge" class="col col-form-label">Person In Charge</label>
                                         <div class="col">
-                                            <input id="personInCharge" class="form-control" readonly
+                                            <input id="personInChargeID" class="form-control" readonly
                                                 value="{{ Auth::user()->UserID }}">
+                                            <input id="personInCharge" class="form-control" readonly
+                                                value="{{ Auth::user()->FirstName }} {{ Auth::user()->LastName }}">
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +172,7 @@
                                 <div class="container">
                                     <table id="invoiceTable" class="table table-hover table-light">
 
-                                    <div class="d-flex" id="cash_error"  style="width:100%"></div>
+                                        <div class="d-flex" id="cash_error" style="width:100%"></div>
 
                                         <thead>
                                             <tr class="table yellow">
@@ -188,7 +190,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        
+
                                         <div class="col">
                                             <div class="form-group row">
                                                 <label for="total" class="col-sm-7 col-form-label">Total</label>
@@ -271,20 +273,24 @@
             var tab = document.getElementById("invoiceTable");
             var rowLength = tab.rows.length;
 
-            
             quantity = document.getElementById("quantity").value;
             var quantInt = parseInt(quantity);
             var intStock = parseInt(Stock);
 
             var status = true;
-
-            if(Stock < quantInt){
+            if(quantity == "" || quantInt == 0 || quantInt < 0){
+                Swal.fire(
+                    'Error!',
+                    'Quantity can not be empty, zero or less than zero!',
+                    'error'
+                )
+            }else if (Stock < quantInt) {
                 Swal.fire(
                     'Error!',
                     'Insufficient stock!',
                     'error'
                 )
-            }else{
+            } else {
                 //If object is empty,
                 if (products.length == 0) {
                     products.push({
@@ -319,10 +325,10 @@
                             var a = products[i].quantity + quantInt;
                             var qty = products[i].quantity;
 
-                            if(a <= Stock){
+                            if (a <= Stock) {
                                 console.log("Product already there with the ID:" + products[i].id +
-                                "Therefore, we just check the quantity if it's possible to add.");
-                                
+                                    "Therefore, we just check the quantity if it's possible to add.");
+
                                 status = true;
                                 products[i].quantity += quantInt;
 
@@ -366,27 +372,27 @@
                                 }
 
                                 break;
-                            }else{
+                            } else {
                                 var x = intStock - qty;
 
-                                if(x == 0){
+                                if (x == 0) {
                                     Swal.fire(
-                                    'Error!',
-                                    "Maximum reached! You can't add more!",
-                                    'error'
+                                        'Error!',
+                                        "Maximum reached! You can't add more!",
+                                        'error'
                                     )
-                                }else{
+                                } else {
                                     Swal.fire(
-                                    'Error!',
-                                    'Insufficient stock! At most, you can only add '+x+'!',
-                                    'error'
+                                        'Error!',
+                                        'Insufficient stock! At most, you can only add ' + x + '!',
+                                        'error'
                                     )
                                 }
-                                
+
                                 status = true;
                                 break;
                             }
-                                break;
+                            break;
                         } else {
                             console.log("Product is unique therefore we add");
                             status = false;
@@ -452,7 +458,7 @@
 
         function calculateChange() {
             $('#cash_error').removeClass('alert alert-danger');
-            $('#cash_error').val("");
+            $('#cash_error').html("");
 
             cash = document.getElementById("cash").value;
             subTotal = document.getElementById("total").value;
@@ -464,6 +470,7 @@
         function storeTransaction() {
             var data = {
                 products,
+                'PersonInChargeID': $('#personInChargeID').val(),
                 'PersonInCharge': $('#personInCharge').val(),
                 'ModeOfPayment': 'Cash',
             }
@@ -503,7 +510,7 @@
             });
         }
 
-        $('#addDebtorModal').on('hidden.bs.modal', function () {
+        $('#addDebtorModal').on('hidden.bs.modal', function() {
             $('#debt_errList').removeClass('alert alert-danger');
             $('#debtName').val("");
         });
@@ -513,6 +520,7 @@
             var data = {
 
                 products,
+                'PersonInChargeID': $('#personInChargeID').val(),
                 'PersonInCharge': $('#personInCharge').val(),
                 'ModeOfPayment': 'Cash',
                 'Balance': balance,
@@ -538,7 +546,7 @@
                         $.each(response.errors, function(key, err_values) {
                             $('#debt_errList').append('<li>' + err_values + '</li>');
                         })
-                    }else if (response.status == 20012){
+                    } else if (response.status == 20012) {
                         $('#debt_errList').html("");
                         $('#debt_errList').addClass('alert alert-danger');
                         $('#debt_errList').html(response.message);
@@ -566,28 +574,38 @@
             var cash = parseFloat($('#cash').val());
             var total = parseFloat($('#total').val());
             var checkEmpty = $('#cash').val();
-            var percentage1 = total/2;
-            if (cash < percentage1) {
-                    console.log('half: '+percentage1);
-                    console.log('total: '+total);
+            var percentage1 = total / 2;
+
+            if (cash >= total) {
+                storeTransaction();
+            } else {
+                if (cash < percentage1) {
+                    console.log('half: ' + percentage1);
+                    console.log('total: ' + total);
                     $('#cash_error').html("");
                     $('#cash_error').addClass('alert alert-danger');
-                    $('#cash_error').text("Downpayment for debt should at least be Php "+percentage1.toFixed(2)+", or <b>50% of the Total!");  
-            }else if(cash >= percentage1){
-                $('#addDebtorModal').modal('show');
-            } else if(checkEmpty == ""){
-                $('#cash_error').html("");
-                $('#cash_error').addClass('alert alert-danger');
-                $('#cash_error').text("Please fill in all fields!");
-            }else{
-                storeTransaction();
+                    $('#cash_error').text("Downpayment for debt should at least be Php " + percentage1.toFixed(2) +
+                        ", or 50% of the Total!");
+
+                } else if (cash >= percentage1) {
+                    $('#cash_error').html("");
+                    $('#addDebtorModal').modal('show');
+
+
+                } else if (checkEmpty == "") {
+                    $('#cash_error').html("");
+                    $('#cash_error').removeClass('alert alert-danger');
+                    $('#cash_error').text("Please fill in all fields!");
+                }
             }
+
+
         });
 
         $(document).on('click', '.add_debt', function(e) {
             var total = $('#total').val();
             var cash = $('#cash').val();
-                storeDebt();
+            storeDebt();
         });
     </script>
 @endsection

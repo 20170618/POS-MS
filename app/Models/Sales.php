@@ -8,5 +8,5 @@ class Sales extends Model
 {
     protected $primaryKey = 'SalesID';
     protected $table = 'sales';
-    protected $fillable = ['PersonInCharge','SalesDateTime','ModeOfPayment'];
+    protected $fillable = ['PersonInCharge','SalesDateTime','ModeOfPayment','PersonInChargeID'];
 }

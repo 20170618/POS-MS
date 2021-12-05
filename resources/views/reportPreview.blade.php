@@ -8,148 +8,228 @@
         <meta name="csrf-token" content="{{csrf_token()}}"> {{-- You need this to run CRUD operations --}}
 
         <title>Point of Sale Migui's Store</title>
-       <style>
-           /* devanagari */
-           @font-face {
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 400;
-            src: url(https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrJJbecmNE.woff2) format('woff2');
-            unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
-            }
-            /* latin-ext */
-            @font-face {
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 400;
-            src: url(https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrJJnecmNE.woff2) format('woff2');
-            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-            }
-            /* latin */
-            @font-face {
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 400;
-            src: url(https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
-            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-            }
+     
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+        <link href="../../../css/bootstrap.css" rel="stylesheet">
+        <link href="../../../css/sidebar.css" rel="stylesheet">
+        <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
 
-           body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #343a40;
-            background-color: #f8f5f0;
-            }
+        <script src="https://kit.fontawesome.com/ad9a071612.js" crossorigin="anonymous"></script>
 
-            .button {
-            background-color:#008CBA;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: right;
-            text-decoration: none;
-            font-size: 16px;
-            border-radius: 8px;
-            display:inline-block;
-            overflow: auto;
-            white-space: nowrap;
-            }
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
+        </script>
 
-            th, td {
-            padding: 15px;
-            text-align: left;
-            }
-            table {
+        <script src="../../../js/sidebar.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            border-collapse: collapse;
-            width: 100%;
-            }
+    </head>
 
-            table td, table th {
-            border: 1px solid #ddd;
-            padding: 8px;
-            }
+    <body>
+        <div class="container-fluid">
+            <div class="container-fluid">
+                
+            
+                <div class="row">
+        
+                    <h2 style="margin-top: 5px">
+                        REPORT PREVIEW
+                        <button class="btn btn-yellow" id="GenerateButton" type="submit" style="float: right">Export To PDF</button>
+                    </h2>
 
-            table tr:nth-child(even){background-color: #f2f2f2;}
+                    <hr>
 
-            table tr:hover {background-color: #ddd;}
-
-            table th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: grey;
-            color: white;
-            }
-
-            a {
-            color: #ffffff;
-            text-decoration: none;
-            }
-
-            .container,
-            .container-fluid,
-            .container-xl,
-            .container-lg,
-            .container-md,
-            .container-sm {
-            width: 80%;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: auto;
-            margin-left: auto;
-            }
-
-
-
-       </style>
-
-
-
-</head>
-<body>
-<h1>REPORT PREVIEWS</h1>
-<hr>
-    <br>
-
-            <a class="button " href="{{ URL::to('/exportToPDF') }}" style='float:right'>
-                Export to PDF
-            </a>
-            <center>
-            <div style="height: 500px; width: 80%;">
-                        <br>
-
-                                <div class="d-flex justify-content-end mb-4">
-
-                                </div>
-
-                                <table style="table table-bordered mb-5">
-                            <thead>
-                                <tr>
-
-                                    <th scope="col">Product name</th>
-                                    <th scope="col">Category</th>   
-                                    <th scope="col">Stock remaining</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                             
+                    <div class="row">
+                        <h4 style="text-align: center">Migui's Store Report</h4>
+                        <h5 style="text-align: center">Date Created: {{$now}}</h5>
+                        <h5 style="text-align: center">Start Date: {{$startDate}} End Date: {{$endDate}}</h3>
+                    </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Number of Sales: {{$sales}}</h5>
+                            </div>
+                            <div class="col">
+                                <h5>Number of Debts: {{$debts}}</h5>
+                            </div>
+                        </div>
                         
+                        
+                            
+                            <h5 style="text-align: center">Sales Breakdown</h5>
 
-                                
+                            @if (in_array('Consumable', $categories) || in_array('allCheck', $categories))
+                                <div>
+                            @else
+                                <div hidden>
+                            @endif
+                            
+                                <h5>Consumable</h5>
+                                <table class="table table-light">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th># Sold</th>
+                                            <th>Sale Per Product</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        @if ($consumableSales == '[]')
+                                            <tr>
+                                                <td colspan="3" style="text-align: center">No Products</td>
+                                            </tr> 
+                                        @else
+                                            @php
+                                            $totalCon = 0    
+                                            @endphp
+                                            @foreach ($consumableSales as $consumableSale)
+                                            <tr>
+                                                <td>{{$consumableSale->ProductName}}</td>
+                                                <td>{{$consumableSale->sold}}</td>
+                                                <td>{{$consumableSale->cost}}</td>
+                                            </tr>
+                                            @php
+                                            $totalCon += $consumableSale->cost    
+                                            @endphp
+                                            @endforeach
+                                            <tr>
+                                                <td colspan="2" style="text-align: right">Total:</td>
+                                                <td><b>{{$totalCon}}</b></td>
+                                            </tr>
 
-                            </tbody>
+                                                
 
-                        </table>
+                                        @endif                                  
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            @if (in_array('Non-Consumable', $categories) || in_array('allCheck', $categories))
+                                <div>
+                            @else
+                                <div hidden>
+                            @endif
+                            
+                                <h5>Non-Consumable</h5>
+                                <table class="table table-light">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th># Sold</th>
+                                            <th>Sale Per Product</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        @if ($nonConsumableSales == '[]')
+                                            <tr>
+                                                <td colspan="3" style="text-align: center">No Products</td>
+                                            </tr> 
+                                        @else
+                                            @php
+                                            $totalNCon = 0    
+                                            @endphp
+                                            @foreach ($nonConsumableSales as $nonConsumableSale)
+                                            <tr>
+                                                <td>{{$nonConsumableSale->ProductName}}</td>
+                                                <td>{{$nonConsumableSale->sold}}</td>
+                                                <td>{{$nonConsumableSale->cost}}</td>
+                                            </tr>
+                                            @php
+                                            $totalNCon += $nonConsumableSale->cost
+                                            @endphp
+                                            
+                                            @endforeach
+                                            <tr>
+                                                <td colspan="2" style="text-align: right">Total:</td>
+                                                <td><b>{{$totalNCon}}</b></td>
+                                            </tr>
+                                        @endif                                  
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
 
+                            @if (in_array('E-Load', $categories) || in_array('allCheck', $categories))
+                                <div>
+                            @else
+                                <div hidden>
+                            @endif
+                            
+                                <h5>E-Load</h5>
+                                <table class="table table-light">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Sale Per Product</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        @if ($eLoadSales == '[]')
+                                            <tr>
+                                                <td colspan="3" style="text-align: center">No Products</td>
+                                            </tr> 
+                                        @else
+                                            @php
+                                            $totalELoad = 0    
+                                            @endphp
+                                            @foreach ($eLoadSales as $eLoadSale)
+                                            <tr>
+                                                <td>{{$eLoadSale->ProductName}}</td>
+                                                <td>{{$eLoadSale->sold}}</td>
+                                            </tr>
+                                            @php
+                                            $totalELoad += $eLoadSale->sold
+                                            @endphp
+                                            
+                                            @endforeach
+                                            <tr>
+                                                <td colspan="1" style="text-align: right">Total:</td>
+                                                <td><b>{{$totalELoad}}</b></td>
+                                            </tr>
+                                        @endif                                  
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
 
+                            <h5 style="text-align: center">Products Out of Stock</h5>
+                            <table class="table table-light">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                     
+                                </thead>
+                                <tbody>
+                                    @if ($outOfStocks == '[]')
+                                        <tr>
+                                            <td colspan="3" style="text-align: center">No Products</td>
+                                        </tr> 
+                                    @else
+                                        @foreach ($outOfStocks as $outOfStock)
+                                        <tr>
+                                            <td>{{$outOfStock->ProductName}}</td>
+                                            <td>{{$outOfStock->Category}}</td>
+                                            <td>{{$outOfStock->Stock}}</td>
+                                        </tr> 
+                                        @endforeach
+                                    @endif                                  
+                                     
+                                </tbody>
+                            </table>
+    
+    
+                </div>
+            </div>
         </div>
-    </center>
-
-   
-
     </body>
 </html>
