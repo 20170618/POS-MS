@@ -9,7 +9,6 @@
 
     <div class="container" style="margin-top: 10px;width: 50rem">
 
-
         <div class="card text-white mb-3 blue-bg">
 
             <div class="card-body">
@@ -86,6 +85,7 @@
                                         <label class="form-check-label" for="flexCheckDefault">
                                             All
                                         </label>
+
                                     </div>
 
                                     <hr>
@@ -159,11 +159,13 @@
                     </div>
                 </div>  
 
+                <small>At least one filter is required for both category and mode of payment.</small>
+
 
 
             </div>
             <div class="card-footer" style="text-align: right">
-            <button class="btn btn-yellow" id="GenerateButton" type="submit">Generate</button>
+            <button class="btn btn-yellow" id="GenerateButton" type="submit">Download</button>
             <!--<a class="btn btn-yellow" href="../reportPreview"><b>Generate</b></a>-->
           
             </div>

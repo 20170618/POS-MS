@@ -116,7 +116,6 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::get('reports', [HomeController::class, 'adminReports'])->name('admin.reports');
     Route::get('reports/preview',[HomeController::class, 'reportPreview'])->name('admin.reportPreview');
     Route::get('reports/generate',[HomeController::class, 'adminGenerateReport'])->name('admin.reportGenerate');
-    Route::get('/reports/generate2',[HomeController::class, 'adminGenerateReport2'])->name('admin.reportGenerate2');
 
     // Route::get('/admin/PDF',[HomeController::class,'createPDF']);
 

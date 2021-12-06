@@ -18,6 +18,8 @@ class CreateEloadsTable extends Migration
             $table->unsignedBigInteger('ProductID');
             $table->double('LoadAmount',8,2);
             $table->timestamps();
+
+            $table->foreign('ProductID')->references('ProductID')->on('Product');
         });
     }
 

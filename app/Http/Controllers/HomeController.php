@@ -583,26 +583,6 @@ class HomeController extends Controller
 
     }
 
-    public function adminGenerateReport2(Request $request){
-        $now = Carbon::now();
-        $startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
-
-        $newStartDate = date('Y-m-d', strtotime($startDate));
-        $newEndDate = date('Y-m-d', strtotime($endDate));
-
-        $data = DB::table('product')
-            ->select()
-            ->where('Stock','=','0')
-            ->whereBetween('updated_at', [$newStartDate, $newEndDate]);
-
-
-         $pdf = PDF::loadview('exportToPDF', compact('data'));
-
-
-        return $pdf->download('POS-MSReport_'.$now->toDateTimeString().'.pdf');
-    }
-
     public function reportPreview(Request $request){
         $request->validate([
             'Category' => 'required|min:1',
@@ -819,16 +799,6 @@ class HomeController extends Controller
 
         <div class="page-break"></div>
 
-        <div class="row">
-            <div class="col">
-                <h5>Number of Sales: '.$sales.'</h5>
-            </div>
-            <div class="col">
-                <h5>Number of Debts: '.$debts.'</h5>
-            </div>
-        </div>
-
-
         <h5 style="text-align: center">'.$reportType.'</h5>
         ';
         if (in_array('Consumable', $categories) || in_array('allCheck', $categories)) {
@@ -850,14 +820,14 @@ class HomeController extends Controller
             </thead>
             <tbody>'
         ;
-
+        $totalCon = 0;
         if ($consumableSales == '[]') {
             $output .=
             '<tr>
                 <td colspan="3" style="text-align: center">No Products</td>
             </tr> ';
         } else {
-            $totalCon = 0;
+            
             foreach ($consumableSales as $consumableSale) {
                 $output .=
                 '<tr>
@@ -902,14 +872,14 @@ class HomeController extends Controller
             </thead>
             <tbody>'
         ;
-
+        $totalNCon = 0;
         if ($nonConsumableSales == '[]') {
             $output .=
             '<tr>
                 <td colspan="3" style="text-align: center">No Products</td>
             </tr> ';
         } else {
-            $totalNCon = 0;
+            
             foreach ($nonConsumableSales as $nonConsumableSale) {
                 $output .=
                 '<tr>
@@ -953,14 +923,14 @@ class HomeController extends Controller
             </thead>
             <tbody>'
         ;
-
+        $totalELoad = 0;
         if ($eLoadSales == '[]') {
             $output .=
             '<tr>
                 <td colspan="2" style="text-align: center">No Products</td>
             </tr> ';
         } else {
-            $totalELoad = 0;
+            
             foreach ($eLoadSales as $eLoadSale) {
                 $output .=
                 '<tr>
@@ -1016,12 +986,33 @@ class HomeController extends Controller
             }
         }
 
+        $totalSales = $totalCon + $totalNCon + $totalELoad;
+
         $output .=
         '</tbody>
         </table>'
         ;
 
         $output .='
+        <h5 style="text-align: center">Summary</h5>
+
+        <table class="table table-light">
+            <thead class="thead-dark">
+                <tr>
+                    <th># of Sales</th>
+                    <th># of Debts</th>
+                    <th>Total Sales</th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                <tr>
+                    <td>'.$sales.'</td>
+                    <td>'.$debts.'</td>
+                    <td>'.$totalSales.'</td>
+                </tr>
+            </tbody>
+        </table>
         </body>
         </html>';
         // End of PDF Format
