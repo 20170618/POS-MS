@@ -203,7 +203,12 @@ class HomeController extends Controller
             ->where('ModeOfPayment','!=','Credit')
             ->orderBy('sales.SalesID', 'desc')
             ->get();
-        return view('admin.transactions', compact('sales'));
+        $salesdetails = DB::table('salesdetails')
+            ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+            ->join('product','salesdetails.ProductID','=','product.productID')
+            ->select()
+            ->get();
+        return view('admin.transactions', compact('sales','salesdetails'));
     }
 
     public function adminEload()
@@ -511,21 +516,6 @@ class HomeController extends Controller
 
 
         }
-    }
-
-    public function transactionDetails($id){
-        $details = DB::table('salesdetails')
-                    ->join('product','SalesDetails.ProductID','=','product.ProductID')
-                    ->select('SalesDetails.*', 'product.ProductName as ProductName', 'product.Price as ProductPrice')
-                    ->where('SalesID', '=', $id)
-                    ->get();
-        $sales = DB::table('sales')
-                    ->select()
-                    ->where('SalesID','=',$id)
-                    ->get();
-
-        return view('admin.transactionDetails', compact('details','sales'));
-
     }
 
     public function editTransaction($id){
@@ -1304,14 +1294,15 @@ class HomeController extends Controller
         $details = DB::table('salesdetails')
                     ->join('sales','salesdetails.SalesID','=','sales.SalesID')
                     ->join('product','salesdetails.ProductID','=','product.ProductID')
-                    ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName')
-                    ->where('salesID','$id')
+                    ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName','product.Price as ProductPrice')
+                    ->where('salesdetails.salesID','=',$id)
                     ->get();
 
-        return response()->json([
-            'status' => 123,
-            'details' => $details
-        ]);
+        // return response()->json([
+        //     'status' => 123,
+        //     'details' => $details
+        // ]);
+        return (compact('details'));
     }
 
     public function searchTransactions(Request $request){
@@ -1319,6 +1310,12 @@ class HomeController extends Controller
             $output='';
             $query = $request->get('query');
             if($query != ''){
+                $credits = DB::table('sales')
+                    ->join('users','sales.PersonInChargeID','=','users.UserID')
+                    ->join('credits','sales.SalesID','=','credits.SalesID')
+                    ->select('sales.*','users.*')
+                    ->whereNotNull('credits.BalancePayDate');
+
                 $data = DB::table('sales')
                     ->join('users','sales.PersonInChargeID','=','users.UserID')
                     ->join('credits','sales.SalesID','=','credits.SalesID')
@@ -1363,20 +1360,18 @@ class HomeController extends Controller
                         <th scope="row">'.$row->SalesID.'</th>
                         <td>'.$row->ModeOfPayment.'</td>
                         <td>'.$row->created_at.'</td>
-                        <td>'.$row->FirstName.' '.$row->LastName.'</td>
-                        <td>';
+                        <td>'.$row->FirstName.' '.$row->LastName.'</td>';
 
                         foreach ($details as $detail) {
                             if ($detail->SalesID == $row->SalesID) {
-                                $output .= ''.$detail->ProductName.' x '.$detail->Quantity.'<br>';
                                 $total += ($detail->Quantity * $detail->ProductPrice);
                             }
                         }
 
-                    $output .='</td>
-                        <td>'.$total.'</td>
+                    $output .='
+                        <td>&#8369;'.number_format($total, 2).'</td>
                         <td>
-                                <a href="'.route('admin.transactionDetails', $row->SalesID).'" class="btn btn-primary "><i class="fas fa-eye"></i></a>
+                                <button class="btn btn-primary transactionDetails" value="'.$row->SalesID.'"><i class="fas fa-eye"></i></button>
                                 <a class="btn btn-primary" href="'.route('admin.editTransaction', $row->SalesID).'"><i class="fas fa-pen"></i></a>
                                 <button class="btn btn-secondary delete_transaction" value="'.$row->SalesID.'" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-archive"></i></button>
                         </td>

@@ -88,7 +88,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
     Route::post('transactions/store-debt', [HomeController::class, 'storeDebt']);
     Route::get('search', [HomeController::class, 'action'])->name('admin.search');
     Route::get('categoryinput/{query}', [HomeController::class, 'categoryInput'])->name('admin.categoryinput');
-    Route::get('transactionDetails/{id}', [HomeController::class, 'transactionDetails'])->name('admin.transactionDetails');
+    Route::get('transactionDetails/{id}', [HomeController::class, 'showTransactionDetails'])->name('admin.transactionDetails');
     Route::get('transactions/edit/{id}', [HomeController::class, 'editTransaction'])->name('admin.editTransaction');
     Route::put('transactions/update/{id}', [HomeController::class, 'updateTransaction'])->name('admin.updateTransaction');
     Route::get('viewSamePricedProducts/{id}', [HomeController::class, 'viewSamePricedProducts'])->name('admin.viewSame');

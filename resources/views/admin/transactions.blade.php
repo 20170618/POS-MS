@@ -46,14 +46,13 @@
                         <th scope ="col">Mode of Payment</th>
                         <th scope="col">Date & Time</th>
                         <th scope="col">Person In Charge</th>
-                        <th scope="col">Order Details</th>
                         <th scope="col">Sales Total</th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
 
                     <tbody id="transactionsBody">
-                    @foreach ($sales as $sale)
+                    {{-- @foreach ($sales as $sale)
                         <tr style="align-content: center; text-align: center;">
 
                             <th scope="row">{{$sale->SalesID}}</th>
@@ -66,7 +65,7 @@
                                 <button class="btn btn-secondary delete_transaction" value="{{$sale->SalesID}}" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-archive"></i></button>
                             </td>
                         </tr>
-                    @endforeach
+                    @endforeach --}}
                     </tbody>
                 </table>
             </div>
@@ -79,7 +78,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header blue-bg yellow">
-                    <h5 class="modal-title"><i class="fas fa-list-ul"></i> &nbsp;&nbsp;Sales Details</h5>
+                    <h5 class="modal-title" id="modalTitle"><i class='fas fa-list-ul'></i> &nbsp;&nbsp;Sales Details</h5>
                     <button type="button" class="btn-close dirty-white" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"></span>
                     </button>
@@ -96,67 +95,8 @@
                                     <th>Subtotal</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                    <td>Test</td>
-                                </tr>
+                            <tbody id="productsTable">
+                                
 
                             </tbody>
                         </table>
@@ -226,26 +166,45 @@
 
             fetch_data();
 
-            $(document).click('.transaction_detail_show',function (e) { 
-                e.preventDefault();
-
-                var transacID = $(this).val();
-            
-                var data = {
-                    'transacID': transacID,
-                };
-
-                $('#transactionDetailModal').modal('show');
+            $(document).on('click', '.transactionDetails', function (e) {
+            e.preventDefault();
+            var t_id = $(this).val();
+            $('#transactionDetailModal').modal('show');
+            $("#productsTable").html('');
+            $("#modalTitle").html('');
 
                 $.ajax({
                     type: "GET",
-                    url: "show-transaction-detail/"+ transacID,
-                    success: function (response) {
+                    url: "transactionDetails/" + t_id,
+                    success: function (data) {
+                        $("#modalTitle").append("<i class='fas fa-list-ul'></i> &nbsp;&nbsp;Sales Details: "+t_id+"");
+                        var len = data.details.length;
+
+                        for (var i = 0; i < len; i++) {
+                            var id = data.details[i].ProductID;
+                            var productN = data.details[i].ProductName;
+                            var productP = data.details[i].Quantity;
+                            var productS = data.details[i].Quantity * data.details[i].Price;
+
                         
+                            var tr_str = "<tr style='text-align: center'>" +
+                            "<td align='center'>" + productN + "</td>" +
+                            "<td align='center'>" + productP + "</td>" +
+                            "<td align='center'>&#8369;" + productS.toFixed(2) + "</td>" +
+                            "</tr>";
+                            $("#productsTable").append(tr_str);
+                            }
+                        
+
+                        
+                        
+                    
+                    var tableEnd = "</tbody>";
+                    $("#productsTable").append(tableEnd);
                     }
                 });
-
             });
+
 
             //fetch all records
             function fetch_data(query=''){
