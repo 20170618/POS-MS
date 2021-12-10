@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
    
 class LoginController extends Controller
 {
@@ -50,8 +54,34 @@ class LoginController extends Controller
         if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
         {
             if (auth()->user()->UserType == "admin") {
+                $now = Carbon::now();
+                $restricteds = DB::table('users')
+                    ->select()
+                    ->where('userType', '=' ,'restricted')
+                    ->get();
+                foreach ($restricteds as $restricted) {
+                    $end = Carbon::parse($restricted->created_at);
+                    $length = $end->diffInDays($now);
+                    if ($length >= 365) {
+                        $delete = User::find($restricted->UserID);
+                        $delete->delete();
+                    }
+                }
                 return redirect()->route('admin.home');
             }else if(auth()->user()->UserType == "user"){
+                $now = Carbon::now();
+                $restricteds = DB::table('users')
+                    ->select()
+                    ->where('userType', '=' ,'restricted')
+                    ->get();
+                foreach ($restricteds as $restricted) {
+                    $end = Carbon::parse($restricted->created_at);
+                    $length = $end->diffInDays($now);
+                    if ($length >= 365) {
+                        $delete = User::find($restricted->UserID);
+                        $delete->delete();
+                    }
+                }
                 return redirect()->route('home');
             }else{
                 return redirect()->route('login');

@@ -7,6 +7,13 @@
 
 @section('content')
 
+                        @if(Session::has('error'))
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <strong>Error!</strong> {!! session('error') !!}
+                            </div>
+                        @endif
+
     <div class="container" style="margin-top: 10px; max-width: 50rem;">
         <div class="row row-cols-2">
 

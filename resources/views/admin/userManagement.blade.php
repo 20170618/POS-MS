@@ -84,6 +84,7 @@
                             <div class="col-7">
                                 <h4 class="yellow">Archived Users</h4>
                             </div>
+                            <small>These users will be deleted from the system one year after their account creation.</small>
                         </div>
 
                         &nbsp;

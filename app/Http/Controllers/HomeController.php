@@ -239,7 +239,18 @@ class HomeController extends Controller
             ->select('sales.*', 'users.*', 'sales.created_at as created_at')
             ->orderBy('sales.SalesID', 'desc')
             ->get();
-        return view('salesperson.eload', compact('sales'));
+        $regular = DB::table('product')
+            ->where('ProductName', 'LIKE', '%Regular%')
+            ->get();
+        $promos = DB::table('product')
+            ->where('ProductName', 'NOT LIKE', '%Regular%')
+            ->where('Category', '=', 'E-Load Promo')
+            ->get();
+        $eloads = DB::table('eloads')
+            ->join('product','eloads.ProductID','=','product.ProductID')
+            ->select('eloads.*','product.ProductName',)
+            ->get();
+        return view('salesperson.eload', compact('sales', 'regular','promos','eloads'));
     }
 
     public function adminAddTransactions()
@@ -435,6 +446,7 @@ class HomeController extends Controller
             $sales->PersonInChargeID = $request->input('PersonInChargeID');
             $sales->PersonInCharge = $request->input('PersonInCharge');
             $sales->ModeOfPayment = $request->input('ModeOfPayment');
+            
             $sales->save();
             $id = $sales->SalesID;
 
@@ -1319,9 +1331,10 @@ class HomeController extends Controller
                 $data = DB::table('sales')
                     ->join('users','sales.PersonInChargeID','=','users.UserID')
                     ->join('credits','sales.SalesID','=','credits.SalesID')
-                    ->select('users.FirstName as FirstName','sales.*','BalancePayDate','users.*','sales.created_at as created_at')
+                    ->select()
+                    //->whereNotNull('credits.BalancePayDate')
+                    //->orWhere('sales.SalesID', '=', $query)
                     ->whereRaw("credits.BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%')")
-                    ->orderByDesc('sales.SalesID')
                     ->get();
 
                 $details = DB::table('salesdetails')

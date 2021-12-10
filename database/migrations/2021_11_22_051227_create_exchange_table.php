@@ -15,9 +15,15 @@ class CreateExchangeTable extends Migration
     {
         Schema::create('exchange', function (Blueprint $table) {
             $table->unsignedBigInteger('SalesID');
-            $table->unsignedBigInteger('ExchangedProductID');
+            $table->unsignedBigInteger('OldProductID');
             $table->unsignedBigInteger('NewProductID');
+            $table->string('Status', 8);
+            $table->string('Reason', 50);
             $table->timestamps();
+
+            $table->foreign('SalesID')->references('SalesID')->on('sales');
+            $table->foreign('OldProductID')->references('ProductID')->on('product');
+            $table->foreign('NewProductID')->references('ProductID')->on('product');
         });
     }
 

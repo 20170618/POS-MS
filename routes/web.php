@@ -130,6 +130,8 @@ Route::group(['middleware'=>['roleCheckUser','auth']], function(){
         return view('salesperson.profile');
     });
     Route::put('update-user/{id}', [UserController::class, 'update']);
+    Route::get('oldPasswordCheck/{id}', [HomeController::class, 'adminOldPassword'])->name('admin.oldPasswordCheck');
+
     Route::get('addTransaction', [HomeController::class, 'salespersonAddTransactions'])->name('salesperson.salespersonaddtransaction');
     Route::get('search', [HomeController::class, 'action'])->name('salesperson.search');
     Route::post('addTransaction/store', [HomeController::class, 'storeTransaction'])->name('salesperson.storeTransaction');
@@ -139,10 +141,18 @@ Route::group(['middleware'=>['roleCheckUser','auth']], function(){
     });
 
     Route::get('salespersonproducts', [HomeController::class, 'salespersonProducts'])->name('salesperson.salespersonproducts');
+    Route::get('products/view-products/{id}', [ProductController::class, 'view']);
     Route::get('salesperson/product_search/action', [LiveSearch::class, 'action2'])->name('salespersonproduct_search.action');
-    Route::get('salesPersonEload', [HomeController::class, 'salesPersonEload'])->name('salesperson.eload');
     Route::get('salespersonsearchProductUnderCat', [HomeController::class, 'searchUnderCategory']);
     Route::get('salesperson/products/view-products/{id}', [ProductController::class, 'view']);
+
+    Route::get('salesPersonEload', [HomeController::class, 'salesPersonEload'])->name('salesperson.eload');
+    Route::get('fetch-loadwallet',[HomeController::class,'fetchLoadWallet']);
+    Route::put('eload/storeEload', [HomeController::class, 'storeEload']);
+    Route::put('eload/filter', [HomeController::class, 'filterPromos']);
+    Route::get('eload/getPromoPrice/{id}', [HomeController::class, 'getPromoPrice']);
+
+    
 
 });
 

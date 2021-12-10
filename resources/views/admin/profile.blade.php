@@ -10,6 +10,7 @@
     <div class="container" style="margin-top: 10px; max-width: 50rem;">
         <div class="card border-secondary mb-3">
             <div class="card-body" id="profileCard">
+                <div id="message"></div>
                 <div class="row">
 
                     <div class="col-6 blue-bg" style="align-content: center; text-align: center">

@@ -54,7 +54,6 @@
                     <tbody id="transactionsBody">
                     {{-- @foreach ($sales as $sale)
                         <tr style="align-content: center; text-align: center;">
-
                             <th scope="row">{{$sale->SalesID}}</th>
                             <td>{{$sale->ModeOfPayment}}</td>
                             <td>{{$sale->created_at}}</td>
@@ -97,7 +96,6 @@
                             </thead>
                             <tbody id="productsTable">
                                 
-
                             </tbody>
                         </table>
 
@@ -162,8 +160,6 @@
 
     <script>
         $(document).ready(function(){
-
-
             fetch_data();
 
             $(document).on('click', '.transactionDetails', function (e) {
@@ -223,8 +219,8 @@
             $(document).on('keyup','#search',function(){
                 var query = $(this).val();
                 fetch_data(query);
+                });
             });
-        });
 
 
         $(document).on("click", ".delete_transaction", function (e) {

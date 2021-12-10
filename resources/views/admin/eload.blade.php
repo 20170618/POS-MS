@@ -396,8 +396,11 @@
             $('#addRegularModal').on('hidden.bs.modal', function() {
                 $('#load_errList').removeClass('alert alert-danger');
                 $('#exampleSelect2').val("");
-                $('#promoPrice').val();
+                $('#regularPrice').val(0.00);
+
+                $('#load_errList').text("");
             })
+
 
             $(document).on('click', '.add_regular', function(e) {
                 e.preventDefault();
@@ -411,7 +414,11 @@
                     $('#load_errList').html("");
                     $('#load_errList').addClass('alert alert-danger');
                     $('#load_errList').text("Please fill in all fields!");
-                } else {
+                } else if(amount < 5){
+                    $('#load_errList').html("");
+                    $('#load_errList').addClass('alert alert-danger');
+                    $('#load_errList').text("Minimum amount for load is 5!");
+                }    else {
                     
                     if(prodId==1){
                         operator = "SMART";

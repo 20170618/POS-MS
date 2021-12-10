@@ -126,7 +126,7 @@ $(document).on('click', '.view_product', function (e) {
             "<td align='center'>" + productN + "</td>" +
             "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
             "</tr>";
-          } else if (data.category == "E-Load Promot") {
+          } else if (data.category == "E-Load Promo") {
             var tr_str = 
             "<tr style='text-align: center' class='table-yellow'>" +
             "<td align='center'>" + productN + "</td>" +
@@ -186,9 +186,8 @@ $(document).on('click', '.view_product2', function (e) {
   e.preventDefault();
   $('#productName').val("");
   categoryClick = $(this).val();
-  console.log(categoryClick);
   var c_id = $(this).val();
-  $("#productsTable tbody").html('');
+  $("#productsTable").html('');
   $('#viewProductModal').modal('show');
   $.ajax({
     type: "GET",
@@ -196,20 +195,94 @@ $(document).on('click', '.view_product2', function (e) {
     success: function (data) {
       var len = data.products.length;
 
+      if (data.category == "E-Load Regular") {
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Load Wallet</th>\
+        </tr>\
+        </thead>";
+      } else if (data.category == "E-Load Promo"){
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Price</th>\
+            <th scope='col'>Load Wallet</th>\
+        </tr>\
+        </thead>";
+      }else{
+        var tableHeader = "<thead style='text-align: center'>\
+        <tr class='table-yellow'>\
+            <th scope='col'>Name</th>\
+            <th scope='col'>Price</th>\
+            <th scope='col'>Stock</th>\
+        </tr>\
+        </thead>";
+      }
+      
+
+      $("#productsTable").append(tableHeader);
+
+      var tableStart =
+      "</thead>\
+      <tbody>";
+      $("#productsTable").append(tableStart);
       for (var i = 0; i < len; i++) {
         var id = data.products[i].ProductID;
         var productN = data.products[i].ProductName;
         var productP = data.products[i].Price;
         var productS = data.products[i].Stock;
+        if (productS <= 5) {
+          if (data.category == "E-Load Regular") {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "</tr>";
+          } else if (data.category == "E-Load Promo") {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "</tr>";
+          } else {
+            var tr_str = 
+            "<tr style='text-align: center' class='table-yellow'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369;" + productP + "</td>" +
+            "<td align='center'>" + productS + "</td>" +
+            "</tr>";
+          }
+        } else {
+          if (data.category == "E-Load Regular"){
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
+            "</tr>";
 
-        var tr_str = "<tr style='text-align: center'>" +
-          "<td align='center'>" + productN + "</td>" +
-          "<td align='center'>" + productP + "</td>" +
-          "<td align='center'>" + productS + "</td>" +
-          "</tr>";
+          }else if (data.category == "E-Load Promo"){
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>&#8369; " + productS.toFixed(2) + "</td>" +
 
-        $("#productsTable tbody").append(tr_str);
+            "</tr>";
+          }else{
+            var tr_str = "<tr style='text-align: center'>" +
+            "<td align='center'>" + productN + "</td>" +
+            "<td align='center'>&#8369; " + productP.toFixed(2) + "</td>" +
+            "<td align='center'>" + productS + "</td>" +
+
+            "</tr>";
+          }
+          
+
+        }
+        $("#productsTable").append(tr_str);
       }
+      var tableEnd = "</tbody>";
+      $("#productsTable").append(tableEnd);
 
 
     }
