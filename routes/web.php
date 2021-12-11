@@ -134,7 +134,10 @@ Route::group(['middleware'=>['roleCheckUser','auth']], function(){
 
     Route::get('addTransaction', [HomeController::class, 'salespersonAddTransactions'])->name('salesperson.salespersonaddtransaction');
     Route::get('search', [HomeController::class, 'action'])->name('salesperson.search');
-    Route::post('addTransaction/store', [HomeController::class, 'storeTransaction'])->name('salesperson.storeTransaction');
+    Route::post('transactions/store', [HomeController::class, 'storeTransaction'])->name('salesperson.storeTransaction');
+    Route::get('transactions/add', [HomeController::class, 'adminAddTransactions'])->name('admin.addtransaction');
+    Route::post('store-debt', [HomeController::class, 'storeDebt']);
+    Route::get('search', [HomeController::class, 'action'])->name('admin.search');
 
     Route::get('viewtransactions', function () {
         return view('salesperson.viewtransaction');

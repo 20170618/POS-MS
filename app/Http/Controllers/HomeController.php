@@ -83,10 +83,11 @@ class HomeController extends Controller
 
     public function salespersonAddTransactions()
     {
-        // $products = DB::table('product')
-        //     ->select('ProductName', 'Price')
-        //     ->get();
-        return view('salesperson.salespersonaddtransaction');
+        $debtors = DB::table('credits')
+             ->select()
+             ->whereNull('BalancePayDate')
+             ->get();
+        return view('salesperson.salespersonaddtransaction', compact('debtors'));
     }
 
     public function fetchLoadWallet()
