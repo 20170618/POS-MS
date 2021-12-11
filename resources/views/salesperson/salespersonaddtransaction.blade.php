@@ -85,7 +85,7 @@
 
                         <div class="row">
                             <div class="col-6 ">
-                                <!-- <form action="{{ route('admin.search') }}" type = "get"> -->
+                                <!-- <form action="{{ route('salesperson.search') }}" type = "get"> -->
                                 <div class="form-group">
                                     <label for="">Search</label>
                                     <div class="input-group mb-3">
@@ -100,7 +100,7 @@
                                 <!-- </form> -->
                             </div>
                             <div class="col-6">
-                                <!-- <form action="{{ route('admin.search') }}" type = "get"> -->
+                                <!-- <form action="{{ route('salesperson.search') }}" type = "get"> -->
                                 <div class="form-group">
                                     <label for="">Quantity</label>
                                     <div class="input-group mb-3">
@@ -221,7 +221,7 @@
                         </div>
 
                         <div class="card-footer" style="text-align: right">
-                            <a href="{{ route('admin.addtransaction') }}" class="btn btn-primary">Clear</a>
+                            <a href="{{ route('salesperson.salespersonaddtransaction') }}" class="btn btn-primary">Clear</a>
                             <button type="button" class="btn btn-yellow storeTransaction">Submit</button>
                             &nbsp;
                     </form>
@@ -243,7 +243,7 @@
             //fetch all records
             function fetch_data(query = '') {
                 $.ajax({
-                    url: "{{ route('admin.search') }}",
+                    url: "{{ route('salesperson.search') }}",
                     method: 'GET',
                     data: {
                         query: query
