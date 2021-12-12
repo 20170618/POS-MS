@@ -270,6 +270,7 @@ class HomeController extends Controller
              ->select('sales.*', 'users.*')
              ->where('sales.SalesID','=', $id)
              ->get();
+             
 
         if($sales){
             return response()->json([
