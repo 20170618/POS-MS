@@ -81,6 +81,9 @@ Route::group(['prefix'=>'admin', 'middleware'=>['roleCheck','auth']], function()
 
     Route::get('searchProductUnderCat', [HomeController::class, 'searchUnderCategory']);
 
+    Route::get('transactions/edit/selectOldProduct/{id}', [HomeController::class, 'selectOldProd']);
+    Route::put('transactions/edit/proceedReplace', [HomeController::class, 'recordReplaceExchange']);
+
     Route::get('transactions', [HomeController::class, 'adminTransactions'])->name('admin.transactions');
     Route::get('transactionsSearch', [HomeController::class, 'searchTransactions'])->name('admin.transactionsSearch');
     Route::get('transactions/add', [HomeController::class, 'adminAddTransactions'])->name('admin.addtransaction');

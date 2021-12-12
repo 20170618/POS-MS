@@ -17,6 +17,7 @@ class CreateExchangeTable extends Migration
             $table->unsignedBigInteger('SalesID');
             $table->unsignedBigInteger('OldProductID');
             $table->unsignedBigInteger('NewProductID');
+            $table->integer('Quantity');
             $table->string('Status', 8);
             $table->string('Reason', 50);
             $table->timestamps();

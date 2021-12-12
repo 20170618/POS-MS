@@ -10,6 +10,7 @@ use App\Models\Sales;
 use App\Models\SalesDetails;
 use App\Models\Category;
 use App\Models\ELoad;
+use App\Models\Exchange;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -532,17 +533,31 @@ class HomeController extends Controller
     }
 
     public function editTransaction($id){
+
         $details = DB::table('SalesDetails')
             ->join('product','SalesDetails.ProductID','=','product.ProductID')
             ->select('SalesDetails.*', 'product.ProductName as ProductName', 'product.Price as ProductPrice', DB::raw('product.Price*SalesDetails.Quantity as AmountDue'))
             ->where('SalesID', '=', $id)
             ->get();
+
         $sales = DB::table('sales')
             ->select()
             ->where('SalesID','=',$id)
             ->get();
 
-        return view('admin.editTransaction', compact('details','sales'));
+        $totalVal = 0;
+        foreach ($details as $detail) {
+            $totalVal = $totalVal + $detail->AmountDue;
+        }
+
+        $REHistory = DB::table('exchange')
+        ->join('product as old','exchange.OldProductID','=','old.ProductID')
+        ->join('product as new','exchange.NewProductID','=','new.ProductID')
+        ->select('exchange.*','old.ProductName as OldProduct','new.ProductName as NewProduct')
+        ->where('SalesID','=',$id)
+        ->get();
+
+        return view('admin.editTransaction', compact('details','sales','totalVal','REHistory'));
     }
 
     public function viewSamePricedProducts($price){
@@ -1324,25 +1339,25 @@ class HomeController extends Controller
             $query = $request->get('query');
             if($query != ''){
                 $credits = DB::table('sales')
-                    ->join('users','sales.PersonInChargeID','=','users.UserID')
-                    ->join('credits','sales.SalesID','=','credits.SalesID')
-                    ->select('sales.*','users.*')
-                    ->whereNotNull('credits.BalancePayDate');
+                ->join('users','sales.PersonInChargeID','=','users.UserID')
+                ->join('credits','sales.SalesID','=','credits.SalesID')
+                ->select("sales.SalesID as SalesID","sales.ModeOfPayment as ModeOfPayment", "sales.created_at as created_at","users.FirstName as FirstName","users.LastName as LastName")
+                ->whereRaw("credits.BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%' OR sales.ModeOfPayment LIKE '%$query%')");
 
                 $data = DB::table('sales')
-                    ->join('users','sales.PersonInChargeID','=','users.UserID')
-                    ->join('credits','sales.SalesID','=','credits.SalesID')
-                    ->select()
-                    //->whereNotNull('credits.BalancePayDate')
-                    //->orWhere('sales.SalesID', '=', $query)
-                    ->whereRaw("credits.BalancePayDate IS NOT NULL AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%')")
-                    ->get();
+                ->join('users','sales.PersonInChargeID','=','users.UserID')
+                ->select("sales.SalesID as SalesID","sales.ModeOfPayment as ModeOfPayment", "sales.created_at as created_at","users.FirstName as FirstName","users.LastName as LastName")
+                ->union($credits)
+                ->whereRaw("ModeOfPayment = 'Cash' AND (sales.SalesID LIKE '%$query%' OR sales.created_at LIKE '%$query%' OR users.FirstName LIKE '%$query%' OR users.LastName LIKE '%$query%' OR sales.ModeOfPayment LIKE '%$query%')")
+                ->get();
+
+                //echo($data);
 
                 $details = DB::table('salesdetails')
-                    ->join('sales','salesdetails.SalesID','=','sales.SalesID')
-                    ->join('product','salesdetails.ProductID','=','product.ProductID')
-                    ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName')
-                    ->get();
+                ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+                ->join('product','salesdetails.ProductID','=','product.ProductID')
+                ->select('salesdetails.*','sales.*','product.*','product.ProductName as ProductName','product.Price as ProductPrice')
+                ->get();
 
             }else{
                 $credits = DB::table('sales')
@@ -1458,7 +1473,7 @@ class HomeController extends Controller
         // ]);
     }
 
-    public function adminUserManagement()
+        public function adminUserManagement()
     {
         $actives = DB::table('users')
             ->select()
@@ -1481,6 +1496,79 @@ class HomeController extends Controller
             ->orWhere('UserType','=','user')
             ->get();
         return view('admin.reports', compact('salespersons'));
+    }
+
+    public function selectOldProd($id, Request $request)
+    {
+        $getProduct = DB::table('product')->select('Price')->where('ProductID','=',$id)->first();
+        $getPrice = $getProduct->Price;
+        $NewProducts = DB::table('product')->select()->where('Price','=',$getPrice)->where('Category','NOT LIKE','%E-load%')->get();
+        $getProductQuantity = DB::table('salesdetails')
+        ->join('sales','salesdetails.SalesID','=','sales.SalesID')
+        ->join('product','salesdetails.ProductID','=','product.productID')
+        ->select('salesdetails.Quantity')
+        ->where('salesdetails.SalesID','=',$request->input('saleID'))
+        ->where('product.ProductID','=',$id)
+        ->where('product.Stock','>',0)
+        ->first();
+
+        return response()->json([
+            'NewProducts'=> $NewProducts,
+            'Quantity' => $getProductQuantity
+        ]);
+    }
+
+    public function recordReplaceExchange(Request $request){
+        
+        $newRecord = new Exchange;
+        $newRecord->SalesID = $request->input('SaleID');
+        $newRecord->OldProductID = $request->input('OldProdID');
+        $newRecord->NewProductID = $request->input('NewProdID');
+        $newRecord->Quantity = $request->input('Quantity');
+        $newRecord->Reason = $request->input('Reason');
+
+        // If replace, spoiled:
+        if($request->input('OldProdID')==$request->input('NewProdID'))
+        {
+            $newRecord->Status = 'Replaced';
+            
+
+            $oldID = $request->input('OldProdID');
+            $oldQty = DB::table('product')->select('Stock')->where('product.ProductID','=',$oldID)->first();
+            $new = $oldQty->Stock - $request->input('Quantity');
+
+                $newRecord->save();
+                Product::where('ProductID', '=', $oldID)->update(['Stock' => $new]);
+                return response()->json([
+                    'status' => 100,
+                ]);
+        }
+        //If exchange product:
+        else
+        {
+            $newRecord->Status = 'Exchange';
+            $newRecord->save();
+
+            //Old Product (+1)
+            $oldID = $request->input('OldProdID');
+            $oldQtyO = DB::table('product')->select('Stock')->where('product.ProductID','=',$oldID)->first();
+            $newO = $oldQtyO->Stock + $request->input('Quantity');
+            Product::where('ProductID', '=', $oldID)->update(['Stock' => $newO]);
+
+            //New Product (-1)
+            $newID = $request->input('NewProdID');
+            $oldQtyN = DB::table('product')->select('Stock')->where('product.ProductID','=',$newID)->first();
+            $newN = $oldQtyN->Stock - $request->input('Quantity');
+            Product::where('ProductID', '=', $newID)->update(['Stock' => $newN]);
+
+            return response()->json([
+                'status' => 200,
+            ]);
+        }
+
+        
+        
+        
     }
 
 

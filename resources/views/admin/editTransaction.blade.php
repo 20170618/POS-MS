@@ -29,11 +29,11 @@
             <div class="col">
                 <div class="card text-white mb-3 blue-bg">
                     @csrf
+                    <h3 class="card-header yellow mx-2">Details: </h3>
                     <div class="card-body yellow">
+
                         <div class="row">
-                            <div class="col-4">
-                                <h3 class="yellow">Details</h3>
-                            </div>
+
                             <div class="col" hidden>
                                 <div class="form-group row">
                                     <label for="personInCharge" class="col col-form-label">Person In Charge</label>
@@ -49,54 +49,97 @@
                             </div>
                         </div>
 
-                        <hr>
-
-                        <div class="row">
-                            <div class="container">
-                                <table id="invoiceTable" class="table table-hover table-light">
-                                    <thead>
-                                        <tr class="table yellow" style="text-align: center">
-                                            <th scope="col">Product</th>
-                                            <th scope="col">Price</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Sub Total</th>
+                        <div class="container">
+                            <table id="invoiceTable" class="table table-hover table-light">
+                                <thead>
+                                    <tr class="table yellow" style="text-align: center">
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Sub Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    @foreach ($details as $detail)
+                                        <tr style="align-content: center; text-align: center;"
+                                            id="{{ $detail->ProductName }}">
+                                            <th scope="row" hidden>{{ $detail->SalesID }}</th>
+                                            <td>{{ $detail->ProductName }}</td>
+                                            <td id="{{ $detail->ProductName }}Price">{{ $detail->ProductPrice }}
+                                            </td>
+                                            <td id="{{ $detail->ProductName }}Quantity">{{ $detail->Quantity }}
+                                            </td>
+                                            <td id="{{ $detail->ProductName }}SubTotal">
+                                                {{ $detail->ProductPrice * $detail->Quantity }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody id="tableBody">
-                                        @foreach ($details as $detail)
-                                            <tr style="align-content: center; text-align: center;"
-                                                id="{{ $detail->ProductName }}">
-                                                <th scope="row" hidden>{{ $detail->SalesID }}</th>
-                                                <td>{{ $detail->ProductName }}</td>
-                                                <td id="{{ $detail->ProductName }}Price">{{ $detail->ProductPrice }}
-                                                </td>
-                                                <td id="{{ $detail->ProductName }}Quantity">{{ $detail->Quantity }}
-                                                </td>
-                                                <td id="{{ $detail->ProductName }}SubTotal">
-                                                    {{ $detail->ProductPrice * $detail->Quantity }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
 
-                                <hr>
+                            <hr>
 
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="form-group row">
-                                            <label for="total" class="col-sm-7 col-form-label">Total</label>
-                                            <div class="col-sm-5">
-                                                @foreach ($details as $detail)
-                                                    <input id="total" class="form-control" placeholder="0.00" readonly
-                                                        value="{{ number_format($detail->AmountDue, 2) }}">
-                                                @endforeach
-                                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label for="total" class="col-sm-7 col-form-label">Total</label>
+                                        <div class="col-sm-5">
+                                            <input id="total" class="form-control" placeholder="0.00" readonly
+                                                value="{{ number_format($totalVal, 2) }}">
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
+                        </div>
+
+
+
+                        <!-- -->
+
+
+                    </div>
+
+                </div>
+                <div class="card text-white mt-4 blue-bg">
+                    <h3 class="card-header yellow mx-2">Replace / Exchange History: </h3>
+                    <div class="d-flex justify-content-center card-body blue flex-wrap">
+
+                        <div class="card-body">
+                            <div class="container mt-3">
+                                <table id="replaceExchange" class="table table-hover table-light">
+                                    <thead>
+                                        <tr class="table yellow" style="text-align: center">
+                                            <th scope="col">Old Item</th>
+                                            <th scope="col">New Item</th>
+                                            <th scope="col">No. Items</th>
+                                            <th scope="col">Reason</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody" style="text-align: center">
+                                        @if ($REHistory == '[]')
+                                            <tr>
+                                                <td colspan="6">No records so far.</td>
+                                            </tr>
+                                        @else
+                                            @foreach ($REHistory as $record)
+                                                <tr>
+                                                    <td>{{ $record->OldProduct }}</td>
+                                                    <td>{{ $record->NewProduct }}</td>
+                                                    <td>{{ $record->Quantity }}</td>
+                                                    <td>{{ $record->Reason }}</td>
+                                                    <td>{{ $record->Status }}</td>
+                                                    <td>{{ $record->created_at }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -120,27 +163,45 @@
                     <div id="err_load_refill"></div>
 
                     <input type="hidden" id="operatorLoadRefill">
-                    <div class="form-group">
-                        <label for="productToReplace" class="form-label">Select product to replace / exchange:</label>
-                        <select class="form-select" id="productToReplace">
-                            <option>Product 1</option>
-                            <option>Product 2</option>
-                            <option>Product 3</option>
-                        </select>
-                    </div>
-                    <div class="form-group mt-4">
-                        <label for="productToReplace" class="form-label ">Select replacement:</label>
-                        <select class="form-select" id="productReplacement">
-                            <option>Product 1</option>
-                            <option>Product 2</option>
-                            <option>Product 3</option>
-                        </select>
-                        <small class="text-muted"><em>The product replacement diplayed are those products that have the same price with the product that will be replaced.</em></small>
-                    </div>
+
+                    <div id="replaceAlert"></div>
 
                     <div class="form-group">
-                        <label for="Reason">Reason for replace / exchange:</label>
-                        <input id="Reason" class="form-control" type="text" name="">
+                        <label for="productToReplace" class="form-label">Select product to replace / exchange:</label>
+                        <select class="form-select" id="productToReplace" required>
+                            <option selected="true" disabled="disabled">Select product...</option>
+                            @foreach ($details as $detail)
+                                <option value="{{ $detail->ProductID }}">{{ $detail->ProductName }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @foreach ($sales as $sale)
+                        <input type="number" value="{{ $sale->SalesID }}" hidden id="saleID">
+                    @endforeach
+
+                    <div id="NewProductSelect">
+                        <div class="form-group mt-4">
+                            <label for="productReplacement" class="form-label ">Select replacement:</label>
+                            <select class="form-select" id="productReplacement">
+
+                            </select>
+                            <small class="text-muted"><em>The product replacement diplayed are those products that have
+                                    the
+                                    same price with the product that will be replaced. You can only exchange one item at a
+                                    time.</em></small>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label for="selectQuantity" class="form-label mt-4">Number of items to replace:</label>
+                            <select class="form-select" id="selectQuantity">
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label for="inputReason">Reason for replace / exchange:</label>
+                            <input id="inputReason" class="form-control" type="text" name="">
+                        </div>
                     </div>
 
 
@@ -148,9 +209,9 @@
 
 
                 <div class="modal-footer" style="text-align: right">
-                    <button class="btn btn-yellow refill_load" type="button">Confirm</button>
+                    <button class="btn btn-yellow proceedReplace" type="button">Confirm</button>
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
-                </div> 
+                </div>
 
             </div>
         </div>
@@ -159,291 +220,133 @@
     <script>
         $(document).ready(function() {
 
+            var saleID = $('#saleID').val();
+
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": jQuery('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+
+            $('#NewProductSelect').hide();
+
             $(document).on('click', '.return', function() {
 
                 $('#returnProductModal').modal('show');
 
             });
 
+
+            //  function changeProd() {
+            //      var x = document.getElementById("productToReplace").value;
+            //      alert(x);
+            //  }
+
+            var selectNewProduct = document.getElementById('productReplacement');
+            var selectQuantity = document.getElementById('selectQuantity');
+
+            $('#productToReplace').change(function(e) {
+                e.preventDefault();
+
+                var x = this.value;
+                var data = {
+                    'saleID': saleID
+                };
+                $('#productReplacement').find('option').remove();
+                $('#selectQuantity').find('option').remove();
+
+                $.ajax({
+                    type: "GET",
+                    url: "selectOldProduct/" + x,
+                    data: data,
+                    success: function(response) {
+
+                        if (response.Quantity == null) {
+                            Swal.fire('Product out of Stock!',
+                                'The selected product currently has no available products to be replaced or exchanged with.',
+                                'error');
+                            $('#NewProductSelect').fadeOut();
+                            $('.proceedReplace').fadeOut();
+                        } else {
+                            var maxVal = response.Quantity.Quantity;
+                            $.each(response.NewProducts, function(key, product) {
+                                var opt = document.createElement('option');
+                                opt.value = product.ProductID;
+                                opt.innerHTML = product.ProductName;
+                                selectNewProduct.appendChild(opt);
+                            });
+                            $('#NewProductSelect').fadeIn();
+                            $('.proceedReplace').show();
+
+                            for (var i = 1; i <= maxVal; i++) {
+                                if (i == 1) {
+                                    var opt = document.createElement('option');
+                                    opt.value = i;
+                                    opt.selected = "true";
+                                    opt.innerHTML = i;
+                                    selectQuantity.appendChild(opt);
+                                } else {
+                                    var opt = document.createElement('option');
+                                    opt.value = i;
+                                    opt.innerHTML = i;
+                                    selectQuantity.appendChild(opt);
+                                }
+                            }
+                        }
+
+
+                    }
+                });
+            });
+
+            $('.proceedReplace').click(function(e) {
+                e.preventDefault();
+
+                //Testing if quantity is selected.
+                var inputReason = $('#inputReason').val();
+                if (inputReason == "") {
+
+                    $('#replaceAlert').html("");
+                    $('#replaceAlert').addClass('alert alert-danger');
+                    $('#replaceAlert').text("Please input reason!");
+
+                } else {
+                    $('#replaceAlert').removeClass('alert alert-danger');
+                    $('#replaceAlert').html("");
+
+
+                    var data = {
+                        'SaleID': saleID,
+                        'OldProdID': $('#productToReplace').val(),
+                        'NewProdID': $('#productReplacement').val(),
+                        'Quantity': $('#selectQuantity').val(),
+                        'Reason': $('#inputReason').val()
+                    }
+
+                    $.ajax({
+                        type: "PUT",
+                        url: "proceedReplace",
+                        data: data,
+                        success: function(response) {
+                            if (response.status == 100) {
+                                Swal.fire('Success!', 'Product has been replaced.', 'success')
+                                    .then(() => {
+                                        location.reload();
+                                    });
+                            } else if (response.status == 200) {
+                                Swal.fire('Success!', 'Product has been exchanged.', 'success')
+                                    .then(() => {
+                                        location.reload();
+                                    });
+                            }
+                        }
+                    });
+
+                }
+
+            });
+
         });
     </script>
 
-    <!-- function newProduct(selectedOpt){
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    var id = selectedOpt.value;
-                    var SaleId = $('#SaleId').val();
-                    //console.log(price);
-
-                    $.ajax({
-                        type: "GET",
-                        url: SaleId+"/editProduct/"+id,
-                        success: function (response) {
-                            if(response.status == 200){
-                                console.log("works")
-                                //console.log(response.products);
-                            }else{
-                                console.log('error');
-                            }
-                        }
-                    });
-                }
-                //format should be year/month/date
-                var dt = new Date().toLocaleString();
-                var initialPrice=[];
-                var toBeUpdated = [];
-                $(document).ready(function(){
-                    var table = document.getElementById("tableBody");
-                    var a;
-                    for (let i in table.rows) {
-                        let row = table.rows[i]
-                        for (let j in row.cells) {
-                            let col = row.cells[2]
-                            let quant = row.cells[3]
-                            if(row.cells[3]){
-                                toBeUpdated.push({name: row.cells[1].innerHTML, quantity: row.cells[3].innerHTML});
-                                console.log(col.innerHTML*quant.innerHTML);
-                                a = col.innerHTML*quant.innerHTML;
-                                initialPrice.push(a);
-                                break;
-                            }
-                        }
-                    }
-                    console.log(toBeUpdated);
-                    console.log(initialPrice);
-                });
-
-                function calculateChange(){
-                    productName = document.getElementById('btn').value;
-                    console.log(productName);
-
-                    /*cash = document.getElementById("cash").value;
-                    subTotal = document.getElementById("total").value;
-
-                        finalTotal = cash - subTotal;
-                        document.getElementById("change").value = finalTotal.toFixed(2);
-                        */
-                }
-
-                $(document).on('click', '.storeTransaction', function(e){
-                e.preventDefault();
-                var data = {
-                    products,
-                    'PersonInCharge': $('#personInCharge').val(),
-                    'ModeOfPayment': 'Cash',
-                    'AmountToPay': $('#total').val(),
-                    'AmountTendered': $('#cash').val(),
-                }
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                $.ajax({
-                    type: "POST",
-                    url: "store",
-                    data: data,
-                    dataType: "json",
-                    success: function(response){
-
-                        if(response.status == 400){
-                        $('#saveform_errList').html("");
-                        $('#saveform_errList').addClass('alert alert-danger');
-                        $.each(response.errors, function(key, err_values){
-                            $('saveform_errList').append('<li>'+err_values+'</li>');
-                        })
-                        }else{
-                        $('#saveform_errList').html("");
-                        $('#sales_message').addClass('alert alert-info');
-                        $('#sales_message').text(response.message);
-                        console.log(response.log);
-                        }
-                    }
-                });
-                console.log(data);
-
-
-            });
-                var toBeRemoved = []
-            $(document).on('click', '.removeItem', function(e){
-                var ProductName = $(this).val();
-                var SubTotal = document.getElementById(''+ProductName+'SubTotal').innerHTML;
-                var Total = document.getElementById('total').value;
-                var Cash = document.getElementById('cash').value;
-                var Change = document.getElementById('change').value;
-                document.getElementById('total').value = (Total-SubTotal).toFixed(2);
-
-                document.getElementById('change').value = (Cash - document.getElementById('total').value).toFixed(2);
-                toBeRemoved.push(ProductName);
-
-                console.log(toBeRemoved);
-                document.getElementById(ProductName).remove();
-            });
-
-            $(document).on('click', '.addQuant', function(e){
-                var ProductName = $(this).val(); // this is to get ProductName
-                var total = document.getElementById('total').value;
-                var cash = document.getElementById('cash').value;
-
-                    var Price1 = document.getElementById(''+ProductName+'Price').innerHTML; //  needs to get ProductName muna
-                    var Quantity1 = document.getElementById(''+ProductName+'Quantity').innerHTML;
-                    var newQuant1 = parseInt(Quantity1) + 1;
-                    //var total1= Price1 * newQuant1;
-                    var total1;
-                    total1 = parseInt(total) + parseInt(Price1);
-                    console.log('total: '+total1);
-
-                if(total1 > cash){
-                    Swal.fire(
-                            "Hold It!",
-                        "Cash insufficient!",
-                            "info"
-                        )
-                }else{
-                    var ProductName = $(this).val();
-                    var SubTotal = document.getElementById(''+ProductName+'SubTotal').innerHTML;
-                    var Total = document.getElementById('total').value;
-                    var Cash = document.getElementById('cash').value;
-                    var Change = document.getElementById('change').value;
-                    var Price = document.getElementById(''+ProductName+'Price').innerHTML;
-                    var Quantity = document.getElementById(''+ProductName+'Quantity').innerHTML;
-                    var newQuant = parseInt(Quantity) + 1;
-                    document.getElementById(''+ProductName+'Quantity').innerHTML = newQuant;
-
-                    document.getElementById(''+ProductName+'SubTotal').innerHTML = newQuant * Price;
-
-                    toBeUpdated.forEach(element => {
-                        if (element.name == ProductName) {
-                            element.quantity = newQuant;
-                            console.log(toBeUpdated);
-                        }
-                    });
-
-                    totalPrice();
-                    calculateChange();
-                }
-
-            });
-
-            $(document).on('click', '.subQuant', function(e){
-                var ProductName = $(this).val();
-                var SubTotal = document.getElementById(''+ProductName+'SubTotal').innerHTML;
-                var Total = document.getElementById('total').value;
-                var Cash = document.getElementById('cash').value;
-                var Change = document.getElementById('change').value;
-                var Price = document.getElementById(''+ProductName+'Price').innerHTML;
-                var Quantity = document.getElementById(''+ProductName+'Quantity').innerHTML;
-                var newQuant = parseInt(Quantity) - 1;
-                if (document.getElementById(''+ProductName+'Quantity').innerHTML == '1') {
-
-                    //HERE BOI
-                    Swal.fire(
-                            "Warning",
-                        "Item quantity cannot be less than 0. If you want to remove the product click delete.",
-                            "info"
-                        ).then(() =>{
-                            location.reload();
-                        });
-                    console.log('cannot be less than 1');
-                }else{
-                    toBeUpdated.forEach(element => {
-                        if (element.name == ProductName) {
-                            element.quantity = newQuant;
-                            console.log(toBeUpdated);
-                        }
-                    });
-
-                    document.getElementById(''+ProductName+'Quantity').innerHTML = newQuant;
-                    document.getElementById(''+ProductName+'SubTotal').innerHTML = newQuant * Price
-                }
-
-                totalPrice();
-                calculateChange();
-            });
-
-            function calculateChange(){
-                    cash = document.getElementById("cash").value;
-                    subTotal = document.getElementById("total").value;
-
-                        finalTotal = cash - subTotal;
-                        document.getElementById("change").value = finalTotal.toFixed(2);
-                }
-
-            $(document).on('click', '.updateTransaction', function(e){
-                e.preventDefault();
-                var s_id = $('#salesID').val();
-                data = {
-                    toBeUpdated,
-                    toBeRemoved,
-                    'AmountToPay' : $('#total').val(),
-                }
-                console.log(data);
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                $.ajax({
-                    type: "PUT",
-                    url: "/admin/transactions/update/"+s_id,
-                    data: data,
-                    dataType: "json",
-                    success: function (response) {
-                    console.log(response.message);
-                    if(response.status == 400){
-                        $('#updateform_errList').html("");
-                        $('#updateform_errList').addClass('alert alert-danger');
-                        $.each(response.errors, function(key, err_values){
-                        $('updateform_errList').append('<li>'+err_values+'</li>');
-                        });
-
-                    }else if(response.status == 404){
-                        $('#updateform_errList').html("");
-                        $('#pizza_message').addClass('alert alert-info');
-                        $('#pizza_message').text(response.message);
-
-                    }else{
-                        $('#updateform_errList').html("");
-                        $('#sales_message').html("");
-                        $('#sales_message').addClass('alert alert-info');
-                        $('#sales_message').text(response.message);
-
-                    }
-                    }
-                });
-            });
-
-            function totalPrice(){
-
-                    var table = document.getElementById("tableBody");
-                    for (let i in table.rows) {
-                        let row = table.rows[i]
-                        for (let j in row.cells) {
-                            let col = row.cells[2]
-                            let quant = row.cells[3]
-                            if(row.cells[3]){
-                                console.log(col.innerHTML*quant.innerHTML);
-                                var a = col.innerHTML*quant.innerHTML;
-                                initialPrice.push(a);
-                                initialPrice.splice(i, 3, a);
-                                break;
-                            }
-                        }
-                    }
-
-                    //Reduce and then update
-                    ftotal = initialPrice.reduce(function(a,b){
-                            return a + b;
-                        }, 0);
-
-                    document.getElementById("total").value = ftotal.toFixed(2);
-
-                    console.log(initialPrice);
-            } -->
 @endsection
