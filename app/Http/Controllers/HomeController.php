@@ -266,10 +266,10 @@ class HomeController extends Controller
 
     public function deleteTransaction($id){
          $sales = DB::table('sales')
-             ->join('users','sales.PersonInCharge','=','users.UserID')
+             ->join('users','sales.PersonInChargeID','=','users.UserID')
              ->select('sales.*', 'users.*')
              ->where('sales.SalesID','=', $id)
-             ->get('salesID');
+             ->get();
 
         if($sales){
             return response()->json([
